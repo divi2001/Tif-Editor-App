@@ -109,6 +109,8 @@ AUTHENTICATION_BACKENDS = [
 SOCIALACCOUNT_PROVIDERS = {} 
 
 # AllAuth settings
+ACCOUNT_TEMPLATE_EXTENSION = 'html'
+
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = True
@@ -118,6 +120,11 @@ ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 300
 ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+ACCOUNT_EMAIL_CONFIRMATION_TEMPLATE = 'account/email/email_confirmation_message.html'
+
+# The important part for password reset confirmation
+ACCOUNT_PASSWORD_RESET_CONFIRM_TEMPLATE = 'account/password_reset_confirm.html'
 
 # Email settings (configure according to your email provider)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
