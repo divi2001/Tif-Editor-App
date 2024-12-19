@@ -18,3 +18,6 @@ def privacy_policy_view(request):
 
 def terms_of_service_view(request):
     return render(request, 'pages/terms_of_service.html')
+
+def affiliate_view(request):
+    return render(request, 'pages/affiliate.html')
