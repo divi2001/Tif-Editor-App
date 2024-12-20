@@ -33,22 +33,29 @@ ALLOWED_HOSTS = []
 
 SITE_ID = 1
 
-INSTALLED_APPS = [
-    'apps.api',
-    'apps.core',
-    'rest_framework',
+INSTALLED_APPS = [    
+    # Django Default Apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'django.contrib.sites',
+
+    # Third-Party Apps
+    'rest_framework',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    # 'allauth.socialaccount.providers.google',  # for Google
+    # 'allauth.socialaccount.providers.google',  # Uncomment if needed
+
+    # Custom Apps
+    'apps.api.apps.ApiConfig',
+    'apps.core.apps.CoreConfig',
+    'apps.subscription_module.apps.SubscriptionModuleConfig',
+    'apps.mainadmin.apps.MainadminConfig',
+    'apps.tif_to_picker.apps.TifToPickerConfig',
 ]
 
 MIDDLEWARE = [
@@ -82,6 +89,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'tif_editor_project.wsgi.application'
 
+# Bootstrap settings
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -198,3 +208,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Media
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 10000  # 10 MB
+STRIPE_PUBLIC_KEY = 'your_public_key_here'
+STRIPE_SECRET_KEY = 'your_secret_key_here'

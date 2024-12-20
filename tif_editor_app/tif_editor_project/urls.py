@@ -21,7 +21,10 @@ from allauth.account.views import PasswordResetFromKeyView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('apps.api.urls')),
-    
+    path('subscription/', include('apps.subscription_module.urls')),
+    path('tif-editor/', include('apps.tif_to_picker.urls')),
+    path('mainadmin', include('apps.mainadmin.urls')),
+
     # Override the default allauth password reset confirm URL before including allauth.urls
     re_path(
         r"^accounts/password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
@@ -32,5 +35,4 @@ urlpatterns = [
     # Include all other allauth URLs
     path('accounts/', include('allauth.urls')),
     path('', include('apps.api.urls')),
-
 ]

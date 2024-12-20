@@ -1,0 +1,4218 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>COLORIFY</title>
+    <!-- Add Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Add Bootstrap Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <style>
+      body {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      main {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: row;
+      }
+      header {
+        background: #fff !important;
+        border-radius: 20px;
+        margin-bottom: 20px;
+        width: 100%;
+      }
+
+      .content {
+        flex-grow: 1;
+        padding: 20px;
+        overflow-y: auto;
+        transition: all 0.3s;
+        background: #fff;
+        border-radius: 1%;
+      }
+
+      .footer {
+        background-color: #343a40;
+        color: white;
+        text-align: center;
+        padding: 10px;
+      }
+
+      .sidebar {
+        background-color: #f8f9fa;
+        overflow-y: auto;
+        transition: all 0.3s;
+      }
+
+      .collapsed {
+        flex: 0 0 46px !important;
+      }
+
+      .sidebar ul {
+        padding: 0;
+        list-style-type: none;
+      }
+
+      .sidebar ul li a {
+        display: block;
+        padding: 10px;
+        text-decoration: none;
+        color: black;
+      }
+      .header-logo {
+        font-size: 1.5rem;
+      }
+
+      .header-profile-pic {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+      }
+      #leftMostColumn {
+        background: #fff;
+        margin-right: 10px;
+        border-radius: 20px;
+      }
+      #rightSidebar {
+        background: #fff;
+        margin-right: 10px;
+        margin-left: 10px;
+        border-radius: 20px;
+      }
+      #secondaryColumn {
+        background: #fff;
+        margin-right: 10px;
+        border-radius: 20px;
+        height: 100vh;
+      }
+    </style>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #f8f9fa;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 30px;
+      }
+      .scrollable-container {
+        width: calc(100% - 220px);
+        height: 84vh;
+        overflow: auto;
+        border: 1px solid #ddd;
+        position: relative;
+        margin-right: 220px;
+      }
+      .zoom-wrapper {
+        transform-origin: top left;
+        transition: transform 0.3s;
+      }
+      .canvas-container {
+        position: relative;
+        overflow: hidden;
+
+        width: {{width}}px;
+        height: {{height}}px;
+      }
+      .layer {
+        position: absolute;
+        background: transparent;
+        pointer-events: none;
+      }
+
+      .toolbar h2 {
+        font-size: 18px;
+        text-align: center;
+        margin-bottom: 15px;
+      }
+
+      .zoom-controls,
+      .layer-toggles {
+        //margin-bottom: 20px;
+      }
+      .zoom-slider {
+        width: 100%;
+      }
+      .layer-toggle-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .thumbnail {
+        width: 30px;
+        height: 30px;
+        margin-right: 10px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        cursor: pointer;
+      }
+      .layer-name {
+        font-size: 14px;
+        flex-grow: 1;
+      }
+      .color-swatch {
+        width: 99px;
+        height: 30px;
+        //display: inline-block;
+
+
+
+      }
+
+      {% comment %} .color-palette {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* Two equal columns */
+        gap: 10px; /* Spacing between items */
+      } {% endcomment %}
+
+      {% comment %} .color-swatch {
+          width: 100px; /* Fill the grid cell */
+          height: 50px; /* Consistent height for swatches */
+          border-radius: 5px; /* Optional: rounded corners */
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow */
+      } {% endcomment %}
+      /* Context Panel Styling */
+      .cp_light {
+        position: absolute;
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+        width: 200px;
+        z-index: 1500;
+        border-radius: 8px;
+        display: none; /* Initially hidden */
+        padding: 10px;
+        overflow-y: auto;
+        max-height: 200px;
+      }
+
+      .cp_light .option {
+        padding: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #333;
+      }
+
+      .cp_light .option:hover {
+        background-color: #f0f0f0;
+      }
+      .cp_light {
+        position: absolute;
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+        width: 200px;
+        z-index: 1500;
+        border-radius: 8px;
+        display: none;
+        padding: 10px;
+        overflow-y: auto;
+      }
+
+      .scrollable {
+          max-height: 330px;
+          overflow-y: auto;
+      }
+
+      .enab, .disab {
+          padding: 8px;
+          font-size: 14px;
+          color: #333;
+          cursor: pointer;
+          display: flex;
+          justify-content: space-between;
+      }
+
+      .disab {
+          color: #aaa;
+          cursor: not-allowed;
+      }
+
+      .enab:hover {
+          background-color: #f0f0f0;
+      }
+
+      .context-panel hr {
+          margin: 8px 0;
+          border-color: #ddd;
+      }
+      /* Add a small arrow on the left side of the context menu */
+      .cp_light::before {
+        content: "";
+        position: absolute;
+        left: -10px;
+        top: 10px;
+        width: 0;
+        height: 0;
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent;
+        border-right: 10px solid #ffffff; /* Match the context menu background color */
+      }
+      .pickr-container {
+        display: flex;
+        {% comment %} gap: 10px; /* Space between buttons */ {% endcomment %}
+        align-items: center; /* Center vertically if the buttons have different heights */
+      }
+
+      .pcr-button {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: none;
+          cursor: pointer;
+      }
+      #colorPickerModal .modal-dialog {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 600px; /* Adjust as needed */
+        margin: 0;
+      }
+
+      #colorPickerModal .modal-content {
+          border-radius: 10px 10px 0 0; /* Rounded corners at the top */
+          box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+      }
+      .modal-backdrop {
+        display: none !important;
+      }
+
+      #colorPickerModal {
+        pointer-events: auto;
+      }
+
+      .modal.fade.show {
+          background: transparent;
+          pointer-events: none; /* Allow clicks through the modal */
+      }
+
+      .modal-dialog {
+          pointer-events: auto; /* Only the modal dialog should capture clicks */
+      }
+      #colorPickerModal {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        max-height: 50%;
+        pointer-events: auto;
+        z-index: 1050; /* Ensure it appears above other content */
+      }
+
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      .spinner {
+          width: 50px;
+          height: 50px;
+          border: 5px solid rgba(0, 0, 0, 0.1);
+          border-top-color: #000;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+      }
+      .visualizer_toolbar {
+        position: fixed;
+        bottom: 0;
+        background: white;
+        left: 0;
+        z-index: 101;
+        padding: 24px;
+        width: 100%;
+        box-shadow: rgba(0, 0, 0, 0.075) 0 -1px;
+        display: flex;
+        justify-content: space-between;
+      }
+      #visualizer_palette {
+        width: 350px;
+      }
+      .palette-selector {
+        height: 46px;
+        position: relative;
+      }
+      .palette-selector.has-btns .palette-selector_colors {
+        width: calc(100% - 35px);
+      }
+      .palette-selector_colors {
+        height: 46px;
+        width: 100%;
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+        position: relative;
+      }
+      .palette-selector_colors div.is-visible {
+        display: block;
+      }
+      .palette-selector_colors div {
+        box-shadow: 1px 0;
+        cursor: pointer;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        float: left;
+        display: none;
+        flex-grow: 1;
+      }
+      .palette-selector.has-btns .palette-selector_buttons {
+        display: block;
+      }
+      .palette-selector_buttons {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 23px;
+        text-align: center;
+        display: none;
+      }
+      .palette-selector.has-btns .palette-selector_colors {
+        width: calc(100% - 35px);
+      }
+      @keyframes spin {
+          to {
+              transform: rotate(360deg);
+          }
+      }
+
+      .palette-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .scroll-container {
+          width: 80%; /* Adjust this width as needed */
+          overflow-x: auto;
+          white-space: nowrap;
+          position: relative;
+          {% comment %} border-radius:11px; {% endcomment %}
+      }
+
+      .color-pickers {
+          display: flex;
+          gap: 10px;
+          padding: 10px;
+      }
+
+      .pickr {
+          flex: 0 0 auto; /* Prevents shrinking */
+      }
+
+      .scroll-btn {
+          border:1px solid;
+          color: #000;
+          border: none;
+          padding: 10px;
+          cursor: pointer;
+          border-radius: 5px;
+          font-size: 18px;
+      }
+
+      .scroll-btn:hover {
+          background-color: #0056b3;
+      }
+
+      .pickr .pcr-button{
+        height:2em!important;
+        margin: 0 .3em 0 .3em !important;
+
+      }
+
+
+      /* Left Sidebar */
+      #leftSidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100vh;
+        background-color: #f5f5f5;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        overflow-y: auto;
+        z-index: 1000;
+      }
+
+      /* Main Content */
+      .scrollable-container {
+        margin-left: 250px;
+        margin-right: 250px;
+        overflow: auto;
+        flex: 1;
+        position: relative;
+      }
+      /* Toggle Button */
+      .toggle-btn {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 5px;
+        cursor: pointer;
+      }
+      /* Collapsed State */
+      .collapsed {
+        width: 40px;
+      }
+
+
+      .collapsed .sidebar-content {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #leftSidebar {
+        left: 0;
+      }
+
+      /* Color Palette Styles */
+      .color-palette {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 10px;
+        overflow-x: auto;
+      }
+
+
+      #loader {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .color-palette {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* Two columns */
+        //gap: 10px; /* Space between swatches */
+      }
+
+      .color-swatch {
+          width: 100px; /* Full width within the grid cell */
+          height: 20px; /* Fixed height for uniformity */
+          //border-radius: 5px; /* Rounded corners */
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional shadow */
+          cursor: pointer;
+          transition: transform 0.2s ease;
+      }
+
+      .color-swatch:hover {
+          transform: scale(1.05); /* Enlarge slightly on hover */
+      }
+    </style>
+    
+  <style>
+ .image-adjustments {
+    position: relative;
+}
+
+.adjustment-panel {
+    position: fixed;  /* Changed to fixed positioning */
+    left: 60px;      /* Offset from left to not overlap with the button */
+    bottom: 20px;    /* Position from bottom */
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    min-width: 250px;
+    max-height: 80vh; /* Limit height to 80% of viewport height */
+    overflow-y: auto; /* Add scrolling if content is too long */
+    z-index: 1000;
+}
+
+.layer-adjustments {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.layer-adjustments h4 {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+.slider-group {
+    margin-bottom: 10px;
+}
+
+.slider-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 12px;
+    color: #666;
+}
+
+.slider-group input {
+    width: 100%;
+}
+
+/* Add some hover effects */
+.layer-adjustments:hover {
+    border-color: #999;
+    transition: border-color 0.2s ease;
+}
+
+.color-button-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.lock-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    padding: 4px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+
+.color-button-wrapper:hover .lock-overlay {
+    opacity: 1;
+}
+
+.lock-overlay svg {
+    display: block;
+}
+
+.mostLeftUl li a {
+  position: relative;
+  transition: all 0.3s ease;
+  padding: 10px;
+  display: block;
+  text-decoration: none;
+  color: #333;
+}
+
+.mostLeftUl li a.active {
+  background-color: rgba(0, 123, 255, 0.1);
+  color: #007bff;
+}
+
+.mostLeftUl li a:hover {
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+.mostLeftUl li a.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background-color: #007bff;
+}
+.inspiration-placeholder {
+  padding: 20px;
+  text-align: center;
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.inspiration-placeholder p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.sidebar-content {
+  display: none;
+}
+
+#inspirationContent {
+  display: block;
+}
+.pdf-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);  /* Two columns */
+  gap: 20px;
+  padding: 20px;
+  max-width: 1200px;  /* Maximum width for the container */
+  margin: 0 auto;     /* Center the grid */
+}
+
+.pdf-item {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pdf-preview {
+  position: relative;
+  cursor: pointer;
+}
+
+.pdf-preview img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.pdf-info {
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.pdf-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pdf-likes {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.download-btn {
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+/* Responsive behavior for smaller screens */
+@media (max-width: 768px) {
+  .pdf-grid {
+      grid-template-columns: 1fr;  /* Single column on mobile */
+  }
+}
+
+
+    </style>
+    <style>
+      .effects-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 15px;
+          padding: 15px;
+      }
+      
+      .effect-item {
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          overflow: hidden;
+          cursor: pointer;
+          transition: transform 0.2s;
+      }
+      
+      .effect-item:hover {
+          transform: scale(1.05);
+      }
+      
+      .effect-preview {
+          position: relative;
+      }
+      
+      .effect-preview img {
+          width: 100%;
+          height: 120px;
+          object-fit: cover;
+      }
+      
+      .effect-name {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: rgba(0, 0, 0, 0.7);
+          color: white;
+          padding: 5px;
+          text-align: center;
+      }
+      
+      /* Effect-specific styles */
+      .effect-item[data-effect="grayscale"] img {
+          filter: grayscale(100%);
+      }
+      
+      .effect-item[data-effect="sepia"] img {
+          filter: sepia(100%);
+      }
+      
+      .effect-item[data-effect="invert"] img {
+          filter: invert(100%);
+      }
+      
+      .effect-item[data-effect="brightness"] img {
+          filter: brightness(150%);
+      }
+      </style>
+      
+    
+  </head>
+  <body>
+    <div id="loading-screen">
+      <div class="spinner"></div>
+    </div>
+    <!-- Header -->
+    <header
+      class="text-dark p-3 d-flex align-items-center justify-content-between ms-auto me-auto"
+    >
+      <!-- Left: Icon -->
+      <div class="header-logo">
+        <i class="bi bi-palette"></i>
+      </div>
+
+      <!-- Center: Search Bar -->
+      {% comment %}
+      <div class="flex-grow-1 mx-3">
+        <input type="text" class="form-control" placeholder="Search" />
+      </div>
+      {% endcomment %}
+
+      <!-- Right: Profile Picture with Dropdown -->
+      <div class="dropdown">
+        <a
+          href="#"
+          class="d-flex align-items-center text-dark text-decoration-none"
+          id="profileDropdown"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          <i class="bi bi-person-bounding-box"></i>
+          <span class="ms-2">John Doe</span>
+          <i class="bi bi-caret-down-fill ms-1"></i>
+        </a>
+        <ul
+          class="dropdown-menu dropdown-menu-end text-small shadow"
+          aria-labelledby="profileDropdown"
+        >
+          <li><a class="dropdown-item" href="#">Profile</a></li>
+          <li><a class="dropdown-item" href="#">Settings</a></li>
+          <li><hr class="dropdown-divider" /></li>
+          <li><a class="dropdown-item" href="#">Logout</a></li>
+        </ul>
+      </div>
+    </header>
+
+
+    <!-- Main Content Area  -->
+    <main class="d-flex">
+      <!-- Left Sidebar -->
+      <div
+        id="leftMostColumn"
+        class="sidebar d-flex flex-column"
+        style="flex: 0 0 150px"
+      >
+        <button
+          class="btn btn-primary btn-sm m-2 d-flex align-items-center"
+          onclick="toggleSidebar('leftMostColumn', this)"
+        >
+          <i class="bi bi-caret-left-fill ms-auto"></i>
+        </button>
+        <ul class="mostLeftUl">
+          <li>
+            <a href="#" id="inspirationButton">
+              <i class="bi bi-brightness-alt-high me-2 mx-1"></i>
+              <span class="textSpan">Inspiration</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" id="trendingButton">
+              <i class="bi bi-graph-up-arrow mx-1"></i>
+              <span class="textSpan">Trending</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" id="effectsButton">
+              <i class="bi bi-magic mx-1"></i>
+              <span class="textSpan">Effects</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" id="favoriteButton">
+              <i class="bi bi-star mx-1"></i>
+              <span class="textSpan">Favourite</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" id="baseColorButton">
+              <i class="bi bi-palette mx-1"></i>
+              <span class="textSpan">Base Color</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" id="ssCollectionButton">
+              <i class="bi bi-collection mx-1"></i>
+              <span class="textSpan">SS Collection</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" id="awCollectionButton">
+              <i class="bi bi-collection mx-1"></i>
+              <span class="textSpan">AW Collection</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+
+        <div id="secondaryColumn" class="sidebar d-flex flex-column" style="flex: 0 0 330px">
+          <button class="btn-sm m-2 d-flex align-items-center" onclick="toggleSidebar('secondaryColumn', this)" style="border: none; background: #fff">
+              <i class="bi bi-caret-left-fill ms-auto"></i>
+          </button>
+          
+          <!-- Trending Content -->
+          <div class="sidebar-content m-4" id="trendingContent" style="display: none;">
+              <h4 class="ms-auto me-auto">Trending Palette</h4>
+              <div class="layer-toggles">
+                  {% for layer in layers %}
+                  <hr />
+                  <div class="layer-toggle-item">
+                      <div id="colorPalette_{{ forloop.counter }}" class="color-palette d-flex flex-column"></div>
+                      <button id="shufflePalette_{{ forloop.counter }}" class="btn btn-sm btn-primary mb-2">
+                          <i class="bi bi-shuffle"></i>
+                      </button>
+                      <button type="button" id="applyButton_{{ forloop.counter }}" class="btn btn-success mx-2">
+                          <i class="bi bi-magic"></i>
+                      </button>
+                  </div>
+                  {% endfor %}
+              </div>
+          </div>
+      
+          <div class="sidebar-content m-4" id="inspirationContent">
+            <h4 class="ms-auto me-auto">Inspirations</h4>
+            <div class="inspiration-content">
+                <div class="pdf-grid">
+  
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-content m-4" id="effectsContent" style="display: none;">
+          <h4 class="ms-auto me-auto">Effects</h4>
+          <div class="effects-grid">
+              <div class="effect-item" data-effect="grayscale">
+                  <div class="effect-preview">
+                      <img src="https://i.pinimg.com/1200x/91/a1/8d/91a18dfb5479bda15a1bade67619a943.jpg" alt="Grayscale">
+                      <div class="effect-name">Grayscale</div>
+                  </div>
+              </div>
+              <div class="effect-item" data-effect="sepia">
+                  <div class="effect-preview">
+                      <img src="https://i.pinimg.com/1200x/91/a1/8d/91a18dfb5479bda15a1bade67619a943.jpg" alt="Sepia">
+                      <div class="effect-name">Sepia</div>
+                  </div>
+              </div>
+              <div class="effect-item" data-effect="invert">
+                  <div class="effect-preview">
+                      <img src="https://i.pinimg.com/1200x/91/a1/8d/91a18dfb5479bda15a1bade67619a943.jpg" alt="Invert">
+                      <div class="effect-name">Invert</div>
+                  </div>
+              </div>
+              <div class="effect-item" data-effect="brightness">
+                  <div class="effect-preview">
+                      <img src="https://i.pinimg.com/1200x/91/a1/8d/91a18dfb5479bda15a1bade67619a943.jpg" alt="Brightness">
+                      <div class="effect-name">Brightness</div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      </div>
+      </div>
+
+      <!-- Main Content -->
+      <div id="mainContent" class="content">
+        <div class="d-flex align-items-center justify-content-between">
+          <h2 class="me-3">Workspace</h2>
+          <div class="zoom-controls">
+            <label for="zoomSlider" class="me-2">Zoom:</label>
+            <input
+              type="range"
+              id="zoomSlider"
+              class="zoom-slider"
+              min="5"
+              max="150"
+              value="5"
+              step="1"
+            />
+          </div>
+        </div>
+        <hr />
+
+        <div class="zoom-wrapper" id="zoomWrapper">
+          <div class="canvas-container">
+            {% for layer in layers %}
+            <div
+              class="layer"
+              id="layer_{{ forloop.counter }}"
+              style="top: {{ layer.layer_position_from_top }}px; left: {{ layer.layer_position_from_left }}px;"
+            >
+              <canvas 
+                id="layer_canvas_{{ forloop.counter }}" 
+                data-original-src="{{ layer.path }}"
+              ></canvas>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Sidebar -->
+      <div
+        id="rightSidebar"
+        class="sidebar d-flex flex-column toolbar scrollable-toolbar"
+        style="flex: 0 0 250px"
+      >
+        <button
+          class="btn-sm m-2 d-flex align-items-center"
+          onclick="toggleSidebar('rightSidebar', this)"
+          style="border: none; background: #fff"
+        >
+          <i class="bi bi-caret-right-fill ms-auto"></i>
+        </button>
+        <div class="sidebar-content m-4">
+          <h4 class="ms-auto me-auto mb-3">Layers</h4>
+
+          <div class="layer-toggles mt-4">
+            {% for layer in layers %}
+            <div class="layer-toggle-item">
+              <img
+                id="thumbnail_{{ forloop.counter }}"
+                class="thumbnail"
+                src=""
+                alt="Layer Thumbnail"
+              />
+              <span class="layer-name">{{ layer.name }}</span>
+              <input
+                type="checkbox"
+                id="toggleLayer{{ forloop.counter }}"
+                checked
+                onchange="toggleLayer({{ forloop.counter }})"
+              />
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div id="contextMenu" class="cp_light">
+        <div
+          id="layerNameDisplay"
+          style="font-weight: bold; margin-bottom: 5px"
+        ></div>
+        <div class="option" onclick="showLayerInfo()">Edit</div>
+      </div>
+      <!-- Color Picker Modal -->
+      <div
+        class="modal fade"
+        id="colorPickerModal"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="colorPickerModalLabel"
+        aria-hidden="true"
+        data-backdrop="false"
+      >
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="colorPickerModalLabel">
+                Select Layer Color
+              </h5>
+              <div style="text-align: center; margin-bottom: 20px">
+                <label for="color-count-slider">Number of Colors: </label>
+                <input
+                  type="range"
+                  id="color-count-slider"
+                  min="1"
+                  max="10"
+                  value="10"
+                  oninput="updateColorCountDisplay()"
+                />
+                <span id="color-count-display">10</span>
+              </div>
+            </div>
+            <div class="modal-body">
+              <div
+                class="color-picker-container pickr-container"
+                id="color-pickers"
+              ></div>
+              <button
+                id="generatePallateColorsBtn"
+                class="btn btn-warning mt-2"
+                onclick="generatePallateColors()"
+              >
+                Generate New Colors
+              </button>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+                onclick="hideModal()"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  <!-- Footer -->
+<footer class="bg-light text-center py-3 mt-auto visualizer_toolbar">
+  <div id="visualizer_buttons_left">
+      <div class="upload-wrapper">
+          <form id="uploadForm" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <input type="file" id="fileInput" name="tiff_file" accept=".tif" style="display: none;">
+              <button type="button" class="btn btn-outline-dark m-0 p-2" onclick="document.getElementById('fileInput').click();">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud-upload" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383"/>
+                      <path fill-rule="evenodd" d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708z"/>
+                  </svg>
+                  Upload
+              </button>
+          </form>
+      </div>
+
+      <div class="image-adjustments">
+          <button type="button" class="btn btn-outline-dark" id="adjustmentToggle">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sliders2-vertical" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M0 10.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1H3V1.5a.5.5 0 0 0-1 0V10H.5a.5.5 0 0 0-.5.5M2.5 12a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 1 0v-2a.5.5 0 0 0-.5-.5m3-6.5A.5.5 0 0 0 6 6h1.5v8.5a.5.5 0 0 0 1 0V6H10a.5.5 0 0 0 0-1H6a.5.5 0 0 0-.5.5M8 1a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 1 0v-2A.5.5 0 0 0 8 1m3 9.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1H14V1.5a.5.5 0 0 0-1 0V10h-1.5a.5.5 0 0 0-.5.5m2.5 1.5a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 1 0v-2a.5.5 0 0 0-.5-.5"/>
+              </svg>
+          </button>
+          <div id="adjustmentPanel" class="adjustment-panel" style="display: none;">
+              <div class="sliders-container"></div>
+          </div>
+      </div>
+  </div>
+
+  <div id="visualizer_palette" class="palette-wrapper">
+      <!-- Left Scroll Button -->
+      <button id="scroll-left" class="btn btn-outline-info"><</button>
+      <div class="palette-selector has-btns is-sortable has-picker is-lockable is-sortable has-picker is-lockable scroll-container" data-colors="10">
+          <div class="color-picker-container mt-1" id="image-color-pickers"></div>
+      </div>
+      <button id="scroll-right" class="btn btn-outline-info">></button>
+  </div>
+  <button type="button" class="btn btn-success2">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shuffle" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"/>
+        <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z"/>
+    </svg>
+    Shuffle
+</button>
+
+  <div id="visualizer_buttons">
+      <button type="button" class="btn btn-success1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+              <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+              <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+          </svg>
+          Export
+      </button>
+
+  </div>
+</footer>
+
+<style>
+.upload-wrapper {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+#fileInput {
+  display: none;
+}
+#uploadForm {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: inline-block;
+  line-height: 0;
+}
+button {
+  margin: 0 !important;
+  line-height: 1;
+}
+</style>
+
+<script>
+document.getElementById('fileInput').onchange = function() {
+  if (this.files.length > 0) {
+      document.getElementById('uploadForm').submit();
+  }
+};
+</script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+      </script>
+    <script>
+
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const trendingButton = document.getElementById('trendingButton');
+        const secondaryColumn = document.getElementById('secondaryColumn');
+    
+        // Initially hide the secondary column
+        secondaryColumn.style.display = 'none';
+    
+        trendingButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Toggle the secondary column
+            if (secondaryColumn.style.display === 'none') {
+                secondaryColumn.style.display = 'flex';
+                // If the sidebar is collapsed, uncollapse it
+                if (secondaryColumn.classList.contains('collapsed')) {
+                    const toggleButton = secondaryColumn.querySelector('button');
+                    toggleSidebar('secondaryColumn', toggleButton);
+                }
+            } else {
+                secondaryColumn.style.display = 'none';
+            }
+        });
+    });
+
+
+      // Function to toggle sidebar collapsed state and change the icon
+      function toggleSidebar(id, button) {
+        const sidebar = document.getElementById(id);
+        const icon = button.querySelector("i");
+        const mostLeftUl = sidebar.querySelectorAll(
+          ".mostLeftUl li a .textSpan"
+        );
+        mostLeftUl.forEach((span) => {
+          if (span.style.display === "none") {
+            span.style.display = "inline"; // Show the span
+          } else {
+            span.style.display = "none"; // Hide the span
+          }
+        });
+
+        sidebar.classList.toggle("collapsed");
+
+        // Update the icon based on the collapse state
+        if (sidebar.classList.contains("collapsed")) {
+
+          icon.classList.remove("bi-caret-left-fill", "bi-caret-right-fill");
+          icon.classList.add("bi-caret-right-fill");
+          //mostLeftUl.style.display = "none";
+        } else {
+
+          icon.classList.remove("bi-caret-left-fill", "bi-caret-right-fill");
+          icon.classList.add("bi-caret-left-fill");
+          //mostLeftUl.style.display = "inline";
+        }
+      }
+      function hideModal(){
+        $('#colorPickerModal').modal('hide');
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const secondaryColumn = document.getElementById('secondaryColumn');
+        const navButtons = document.querySelectorAll('.mostLeftUl li a');
+        const inspirationButton = document.getElementById('inspirationButton');
+        const trendingContent = document.getElementById('trendingContent');
+        const inspirationContent = document.getElementById('inspirationContent');
+        
+        // Function to show content
+        function showContent(contentId) {
+            // Hide all content sections
+            const contents = document.querySelectorAll('.sidebar-content');
+            contents.forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Show the selected content
+            document.getElementById(contentId).style.display = 'block';
+        }
+    
+        // Function to handle active state
+        function setActiveButton(activeButton) {
+            navButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+            activeButton.classList.add('active');
+        }
+    
+        // Effect application logic
+        const effectItems = document.querySelectorAll('.effect-item');
+        effectItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const effect = this.dataset.effect;
+                applyEffectToLayers(effect);
+            });
+        });
+    
+        // Add click handlers for all navigation buttons
+        navButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                setActiveButton(this);
+                
+                // Handle different sections
+                switch(this.id) {
+                    case 'trendingButton':
+                        secondaryColumn.style.display = 'flex';
+                        showContent('trendingContent');
+                        // If the sidebar is collapsed, uncollapse it
+                        if (secondaryColumn.classList.contains('collapsed')) {
+                            const toggleButton = secondaryColumn.querySelector('button');
+                            toggleSidebar('secondaryColumn', toggleButton);
+                        }
+                        break;
+                        
+                    case 'inspirationButton':
+                        secondaryColumn.style.display = 'flex';
+                        showContent('inspirationContent');
+                        if (secondaryColumn.classList.contains('collapsed')) {
+                            const toggleButton = secondaryColumn.querySelector('button');
+                            toggleSidebar('secondaryColumn', toggleButton);
+                        }
+                        break;
+                        
+                    case 'effectsButton':
+                        secondaryColumn.style.display = 'flex';
+                        showContent('effectsContent');
+                        if (secondaryColumn.classList.contains('collapsed')) {
+                            const toggleButton = secondaryColumn.querySelector('button');
+                            toggleSidebar('secondaryColumn', toggleButton);
+                        }
+                        break;
+                        
+                    case 'favoriteButton':
+                    case 'baseColorButton':
+                    case 'ssCollectionButton':
+                    case 'awCollectionButton':
+                    default:
+                        // Hide secondary column for all other buttons
+                        secondaryColumn.style.display = 'none';
+                        break;
+                }
+            });
+        });
+    
+        // Set initial state
+        window.onload = function() {
+            // Show Inspiration content by default
+            secondaryColumn.style.display = 'flex';
+            showContent('inspirationContent');
+            setActiveButton(inspirationButton);
+        };
+    });
+      const layerStates = {
+        editedImages: {},
+        originalImages: {}, // Add this to store original states
+        saveEditedState: function(layerIndex) {
+            const canvas = document.getElementById(`layer_canvas_${layerIndex}`);
+            if (canvas) {
+                this.editedImages[layerIndex] = canvas.toDataURL();
+            }
+        },
+        saveOriginalState: function(layerIndex) {
+            const canvas = document.getElementById(`layer_canvas_${layerIndex}`);
+            if (canvas) {
+                this.originalImages[layerIndex] = canvas.toDataURL();
+            }
+        },
+        getEditedState: function(layerIndex) {
+            return this.editedImages[layerIndex];
+        },
+        getOriginalState: function(layerIndex) {
+            return this.originalImages[layerIndex];
+        },
+        hasEditedState: function(layerIndex) {
+            return !!this.editedImages[layerIndex];
+        },
+        hasOriginalState: function(layerIndex) {
+            return !!this.originalImages[layerIndex];
+        }
+    };
+
+{% comment %} effect js  {% endcomment %}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Add effects button handler
+  const effectsButton = document.getElementById('effectsButton');
+  if (effectsButton) {
+      effectsButton.addEventListener('click', function(e) {
+          e.preventDefault();
+          secondaryColumn.style.display = 'flex';
+          showContent('effectsContent');
+          if (secondaryColumn.classList.contains('collapsed')) {
+              const toggleButton = secondaryColumn.querySelector('button');
+              toggleSidebar('secondaryColumn', toggleButton);
+          }
+      });
+  }
+
+  // Effect application logic
+  const effectItems = document.querySelectorAll('.effect-item');
+  effectItems.forEach(item => {
+      item.addEventListener('click', function() {
+          const effect = this.dataset.effect;
+          applyEffectToLayers(effect);
+      });
+  });
+});
+function applyEffectToLayers(effect) {
+  const totalLayers = document.querySelectorAll('[id^="layer_canvas_"]').length;
+  
+  for (let layer = 1; layer <= totalLayers; layer++) {
+      // Check if layer is locked
+      const colorButton = document.querySelector(`.color-picker[data-layer-index="${layer-1}"]`);
+      if (colorButton && colorButton.dataset.locked === 'true') {
+          console.log(`Layer ${layer} is locked, skipping effect`);
+          continue;
+      }
+
+      const canvas = document.getElementById(`layer_canvas_${layer}`);
+      if (!canvas) continue;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) continue;
+
+      // Save the current state if not already saved
+      if (!layerStates.hasOriginalState(layer)) {
+          layerStates.saveOriginalState(layer);
+      }
+
+      // Apply the effect
+      switch(effect) {
+          case 'grayscale':
+              applyGrayscale(ctx, canvas.width, canvas.height);
+              break;
+          case 'sepia':
+              applySepia(ctx, canvas.width, canvas.height);
+              break;
+          case 'invert':
+              applyInvert(ctx, canvas.width, canvas.height);
+              break;
+          case 'brightness':
+              applyBrightness(ctx, canvas.width, canvas.height, 1.5);
+              break;
+      }
+
+      // Save the edited state
+      layerStates.saveEditedState(layer);
+  }
+}
+
+function applyGrayscale(ctx, width, height) {
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  
+  for (let i = 0; i < data.length; i += 4) {
+      const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      data[i] = avg;     // Red
+      data[i + 1] = avg; // Green
+      data[i + 2] = avg; // Blue
+  }
+  
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function applySepia(ctx, width, height) {
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  
+  for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      
+      data[i] = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189));
+      data[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168));
+      data[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131));
+  }
+  
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function applyInvert(ctx, width, height) {
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  
+  for (let i = 0; i < data.length; i += 4) {
+      data[i] = 255 - data[i];         // Red
+      data[i + 1] = 255 - data[i + 1]; // Green
+      data[i + 2] = 255 - data[i + 2]; // Blue
+  }
+  
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function applyBrightness(ctx, width, height, factor) {
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  
+  for (let i = 0; i < data.length; i += 4) {
+      data[i] = Math.min(255, data[i] * factor);
+      data[i + 1] = Math.min(255, data[i + 1] * factor);
+      data[i + 2] = Math.min(255, data[i + 2] * factor);
+  }
+  
+  ctx.putImageData(imageData, 0, 0);
+}
+{% comment %} effect js end  {% endcomment %}
+
+
+{% comment %} for pdf {% endcomment %}
+// Function to download PDF
+function loadInspirationPDFs() {
+  const inspirationContent = document.getElementById('inspirationContent');
+  
+  // Show loading state
+  inspirationContent.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
+
+  fetch('/inspiration-pdfs/') // Update this URL to match your URL configuration
+      .then(response => response.json())
+      .then(data => {
+          let htmlContent = `
+              <h4 class="ms-auto me-auto">Inspirations</h4>
+              <div class="inspiration-content">
+                  <div class="pdf-grid">
+          `;
+
+          data.pdfs.forEach(pdf => {
+              htmlContent += `
+                  <div class="pdf-item">
+                      <div class="pdf-preview" data-pdf-id="${pdf.id}">
+                          <img src="${pdf.preview_image}" alt="${pdf.title}">
+                          <div class="pdf-info">
+                              <span class="pdf-name">${pdf.title}</span>
+                              <div class="pdf-actions">
+                                  <span class="pdf-likes">
+                                      <i class="bi bi-heart"></i> 
+                                      <span class="likes-count">${pdf.likes_count}</span>
+                                  </span>
+                                  <button class="btn btn-sm btn-primary download-btn" 
+                                          onclick="downloadPDF('${pdf.pdf_url}', '${pdf.title}')">
+                                      <i class="bi bi-download"></i>
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              `;
+          });
+
+          htmlContent += `
+                  </div>
+              </div>
+          `;
+
+          inspirationContent.innerHTML = htmlContent;
+
+          // Initialize event listeners for the newly added elements
+          initializePDFEvents();
+      })
+      .catch(error => {
+          console.error('Error:', error);
+          inspirationContent.innerHTML = '<div class="alert alert-danger">Error loading PDFs</div>';
+      });
+}
+
+function downloadPDF(pdfUrl, title) {
+  fetch(pdfUrl)
+      .then(response => response.blob())
+      .then(blob => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = title;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+      })
+      .catch(error => {
+          console.error('Error downloading PDF:', error);
+          alert('Error downloading the PDF');
+      });
+}
+
+function initializePDFEvents() {
+  // Add any additional event listeners for the PDF items
+  document.querySelectorAll('.pdf-likes').forEach(element => {
+      element.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const pdfId = this.closest('.pdf-preview').dataset.pdfId;
+          toggleLike(pdfId, this);
+      });
+  });
+}
+
+// Function to toggle like
+function toggleLike(pdfId, element) {
+  fetch(`/toggle-like/${pdfId}/`, {
+      method: 'POST',
+      headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+      }
+  })
+  .then(response => response.json())
+  .then(data => {
+      if (data.status === 'success') {
+          const likesCount = element.querySelector('.likes-count');
+          const heartIcon = element.querySelector('.bi');
+          
+          likesCount.textContent = data.likes_count;
+          if (data.liked) {
+              heartIcon.classList.remove('bi-heart');
+              heartIcon.classList.add('bi-heart-fill');
+          } else {
+              heartIcon.classList.remove('bi-heart-fill');
+              heartIcon.classList.add('bi-heart');
+          }
+      }
+  })
+  .catch(error => console.error('Error:', error));
+}
+
+// Call this function when inspiration button is clicked
+document.getElementById('inspirationButton').addEventListener('click', function(e) {
+  e.preventDefault();
+  loadInspirationPDFs();
+});
+
+
+{% comment %} end pdf  {% endcomment %}
+
+
+      function displayColorPalette(layerIndex, colors, maxVisibleColors = 15) {
+        const paletteContainer = document.getElementById(`colorPalette_${layerIndex}`);
+        paletteContainer.innerHTML = '';
+    
+        // Keep track of whether the palette is expanded
+        let isExpanded = false;
+    
+        // Store the initial colors if not already stored
+        window.originalPaletteColors = window.originalPaletteColors || {};
+        if (!window.originalPaletteColors[layerIndex]) {
+            window.originalPaletteColors[layerIndex] = [...colors];
+        }
+        
+        // Store the current colors for this specific palette
+        window.trendingPaletteColors = window.trendingPaletteColors || {};
+        window.trendingPaletteColors[layerIndex] = colors;
+    
+        // Track the toggle state for this palette
+        window.paletteToggleState = window.paletteToggleState || {};
+        window.paletteToggleState[layerIndex] = window.paletteToggleState[layerIndex] || false;
+    
+        // Function to render the color swatches based on the current state
+        function renderPalette() {
+            paletteContainer.innerHTML = '';
+    
+            // Determine which colors to show based on the state
+            const colorsToDisplay = isExpanded ? colors : colors.slice(0, maxVisibleColors);
+            const remainingColorsCount = colors.length - maxVisibleColors;
+    
+            // Display the selected colors
+            colorsToDisplay.forEach((color) => {
+                const swatch = document.createElement('div');
+                swatch.classList.add('color-swatch');
+                swatch.style.backgroundColor = `rgb(${color.join(',')})`;
+                swatch.title = `rgb(${color.join(',')})`;
+                paletteContainer.appendChild(swatch);
+            });
+    
+            // Add the "More" or "Less" label if needed
+            if (remainingColorsCount > 0) {
+                const toggleLabel = document.createElement('div');
+                toggleLabel.classList.add('toggle-colors-label');
+                toggleLabel.innerHTML = isExpanded
+                    ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-minus" viewBox="0 0 16 16"><path d="M5.5 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5"/><path d="M4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm0 1h8a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1"/></svg>'
+                    : `<span class="mx-1" style="font-weight:bold;color:red;">${remainingColorsCount}</span> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-plus" viewBox="0 0 16 16"><path d="M8.5 6a.5.5 0 0 0-1 0v1.5H6a.5.5 0 0 0 0 1h1.5V10a.5.5 0 0 0 1 0V8.5H10a.5.5 0 0 0 0-1H8.5z"/><path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm10-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1"/></svg>`;
+    
+                toggleLabel.addEventListener('click', () => {
+                    isExpanded = !isExpanded;
+                    renderPalette();
+                });
+    
+                paletteContainer.appendChild(toggleLabel);
+            }
+        }
+    
+        // Initial render
+        renderPalette();
+    }
+      function loadZoomValue(){
+        //document.getElementById('zoomWrapper').style.transform = `scale(${0.072})`;
+        document.getElementById('zoomWrapper').style.transform = `scale(${0.3})`;
+      }
+      document.addEventListener('DOMContentLoaded', loadZoomValue);
+      document.getElementById('zoomSlider').addEventListener('input', function() {
+        const zoomLevel = this.value / 100;
+        //const zoomLevel = 0.3;
+
+        document.getElementById('zoomWrapper').style.transform = `scale(${zoomLevel})`;
+      });
+
+      function toggleLayer(layerIndex) {
+        const layerDiv = document.getElementById(`layer_${layerIndex}`);
+        const checkbox = document.getElementById(`toggleLayer${layerIndex}`);
+        layerDiv.style.display = checkbox.checked ? 'block' : 'none';
+      }
+
+      // Analyze the image data to calculate layer-specific parameters
+      function analyzeImageLayer(ctx) {
+        const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+        const data = imageData.data;
+
+        let totalLightness = 0;
+        let totalHue = 0;
+        let pixelCount = 0;
+
+        const hues = [];
+
+        for (let i = 0; i < data.length; i += 4) {
+            // Ignore fully transparent pixels
+            if (data[i + 3] === 0) continue;
+
+            const rgb = [data[i], data[i + 1], data[i + 2]];
+            const hsl = rgbToHsl(rgb[0], rgb[1], rgb[2]);
+
+            totalLightness += hsl[2];
+            totalHue += hsl[0];
+            hues.push(hsl[0]);
+            pixelCount++;
+        }
+
+        // Handle cases where no valid pixels were processed
+        if (pixelCount === 0) {
+            return {
+                avgLightness: 0,
+                avgHue: 0,
+                hueRange: 0,
+                lightnessTolerance: 0,
+                hueTolerance: 0,
+            };
+        }
+
+        const avgLightness = totalLightness / pixelCount;
+        const avgHue = totalHue / pixelCount;
+
+        let hueRange = calculateHueRange(hues);
+
+        const lightnessTolerance = Math.min(0.5, avgLightness * 0.5); // Adjusted scaling
+        const hueTolerance = Math.min(40, hueRange * 0.5);            // Adjusted scaling
+
+        return {
+            avgLightness,
+            avgHue,
+            hueRange,
+            lightnessTolerance,
+            hueTolerance,
+        };
+      }
+
+      function analyzeImageLayerforsingle(ctx) {
+         const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+         const data = imageData.data;
+
+         let totalLightness = 0;
+         let totalHue = 0;
+         let pixelCount = 0;
+
+         const hues = [];
+
+         for (let i = 0; i < data.length; i += 4) {
+             // Ignore fully transparent pixels
+             if (data[i + 3] === 0) continue;
+
+             const rgb = [data[i], data[i + 1], data[i + 2]];
+             const hsl = rgbToHslforsingle(rgb[0], rgb[1], rgb[2]);
+
+             totalLightness += hsl[2];
+             totalHue += hsl[0];
+             hues.push(hsl[0]);
+             pixelCount++;
+         }
+
+         // Handle cases where no valid pixels were processed
+         if (pixelCount === 0) {
+             //console.warn("No valid pixels found in layer.");
+             return {
+                 avgLightness: 0,
+                 avgHue: 0,
+                 hueRange: 0,
+                 lightnessTolerance: 0,
+                 hueTolerance: 0,
+             };
+         }
+
+         const avgLightness = totalLightness / pixelCount;
+         const avgHue = totalHue / pixelCount;
+
+         // Calculate hue range only if there are hues available
+         //const hueRange = hues.length > 0 ? Math.max(...hues) - Math.min(...hues) : 0;
+         let hueRange = calculateHueRangeforsingle(hues);
+
+
+
+         const lightnessTolerance = Math.min(0.7, avgLightness / 2); // Scaled by avgLightness
+         const hueTolerance = Math.min(47, hueRange / 2);            // Scaled by hue range
+
+
+         return {
+             avgLightness,
+             avgHue,
+             hueRange,
+             lightnessTolerance,
+             hueTolerance,
+         };
+       }
+      function rgbToHsl(r, g, b) {
+        r /= 255; g /= 255; b /= 255;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+
+        if (max === min) {
+            h = s = 0; // achromatic
+        } else {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r:
+                    h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+                    break;
+                case g:
+                    h = ((b - r) / d + 2) / 6;
+                    break;
+                case b:
+                    h = ((r - g) / d + 4) / 6;
+                    break;
+            }
+        }
+        return [h, s, l];
+      }
+
+      function hslToRgb(h, s, l) {
+        let r, g, b;
+
+        if (s === 0) {
+            r = g = b = l; // achromatic
+        } else {
+            const hue2rgb = (p, q, t) => {
+                if (t < 0) t += 1; if (t > 1) t -= 1;
+                if (t < 1 / 6) return p + (q - p) * 6 * t;
+                if (t < 1 / 2) return q;
+                if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                return p;
+            };
+            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            const p = 2 * l - q;
+            r = hue2rgb(p, q, h + 1 / 3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1 / 3);
+        }
+
+        return [r, g, b];
+      }
+
+// Function to convert RGB to HSL
+function rgbToHslforsingle(r, g, b) {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+
+    if (max === min) {
+        h = s = 0; // Achromatic
+    } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+        switch (max) {
+            case r:
+                h = (g - b) / d + (g < b ? 6 : 0);
+                break;
+            case g:
+                h = (b - r) / d + 2;
+                break;
+            case b:
+                h = (r - g) / d + 4;
+                break;
+        }
+
+        h /= 6;
+    }
+
+    return [h, s, l];
+}
+
+function hslToRgbforsingle(h, s, l) {
+    let r, g, b;
+
+    if (s === 0) {
+        r = g = b = l; // Achromatic
+    } else {
+        const hue2rgb = function (p, q, t) {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1 / 6) return p + (q - p) * 6 * t;
+            if (t < 1 / 2) return q;
+            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+            return p;
+        };
+
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1 / 3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1 / 3);
+    }
+
+    return [r * 255, g * 255, b * 255];
+}
+
+   function calculateHueRange(hues) {
+        if (hues.length === 0) return 0;
+
+        // Convert hues to degrees (0 to 360)
+        const huesInDegrees = hues.map(h => h * 360);
+
+        // Sort hues
+        huesInDegrees.sort((a, b) => a - b);
+
+        // Calculate differences between adjacent hues
+        let maxDiff = 0;
+        for (let i = 0; i < huesInDegrees.length - 1; i++) {
+            const diff = huesInDegrees[i + 1] - huesInDegrees[i];
+            if (diff > maxDiff) maxDiff = diff;
+        }
+
+        // Include wrap-around difference
+        const wrapAroundDiff = 360 - huesInDegrees[huesInDegrees.length - 1] + huesInDegrees[0];
+        if (wrapAroundDiff > maxDiff) maxDiff = wrapAroundDiff;
+
+        return maxDiff;
+      }
+
+      function calculateHueRangeforsingle(hues) {
+         if (hues.length === 0) return 0;
+
+         let maxHue = -Infinity;
+         let minHue = Infinity;
+
+         for (let hue of hues) {
+             if (hue > maxHue) maxHue = hue;
+             if (hue < minHue) minHue = hue;
+         }
+
+         return maxHue - minHue;
+       }
+      function getDistinctColors(imageData, threshold = 50, maxColors = 5) {
+        const colorCounts = {};
+        const data = imageData.data;
+
+        // Count the frequency of each color
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const a = data[i + 3];
+
+            // Skip fully transparent pixels
+            if (a === 0) continue;
+            // Skip black and white colors
+            //if ((r === 0 && g === 0 && b === 0) || (r === 255 && g === 255 && b === 255)) continue;
+            if ((r === 0 && g === 0 && b === 0)) continue;
+            const colorKey = `${r},${g},${b}`;
+            if (!colorCounts[colorKey]) {
+                colorCounts[colorKey] = 0;
+            }
+            colorCounts[colorKey]++;
+        }
+
+        // Sort colors by frequency
+        const colors = Object.entries(colorCounts)
+            .map(([key, count]) => ({
+                rgb: key.split(',').map(Number),
+                count,
+            }))
+            .sort((a, b) => b.count - a.count);
+
+        const distinctColors = [];
+
+        // Function to calculate Euclidean distance in RGB space
+        function colorDistance(c1, c2) {
+            return Math.sqrt(
+                Math.pow(c1[0] - c2[0], 2) +
+                Math.pow(c1[1] - c2[1], 2) +
+                Math.pow(c1[2] - c2[2], 2)
+            );
+        }
+
+        // Add colors if they are distinct enough
+        colors.forEach(({ rgb }) => {
+            if (distinctColors.length >= maxColors) return;
+
+            const isDistinct = distinctColors.every((d) => colorDistance(d, rgb) > threshold);
+            if (isDistinct) {
+                distinctColors.push(rgb);
+            }
+        });
+
+        return distinctColors;
+      }
+
+
+      function generateUniqueRGBColorArray(count) {
+    const colors = [];
+
+    while (colors.length < count) {
+        // Generate random R, G, B values between 0 and 255
+        const r = Math.floor(Math.random() * 256);
+        const g = Math.floor(Math.random() * 256);
+        const b = Math.floor(Math.random() * 256);
+
+        // Check if the generated color is green-dominated or already exists
+        const isGreenish = (g > r && g > b); // Exclude if green is the dominant color
+        const isDuplicate = colors.some(color => color[0] === r && color[1] === g && color[2] === b);
+
+        // If the color is unique and not green-dominated, add it to the array
+        if (!isGreenish && !isDuplicate) {
+            colors.push([r, g, b]);
+        }
+    }
+
+    return colors;
+}
+
+      function showLayerInfo() {
+        contextMenu.style.display = 'none';
+        $('#colorPickerModal').modal('show');
+        const layerIndex = contextMenu.dataset.layerIndex; // Assuming contextMenu is defined
+
+        updateLayersWithNewColorCount(layerIndex);
+      }
+
+      async function processLayerAsync(ctx, targetColor, newColor, minAreaThreshold = 1, maxSkipCount = 5) {
+    return new Promise(async (resolve) => {
+        const colorProcessor = new ColorProcessor();
+        
+        // Get the layer index from the canvas ID
+        const canvasId = ctx.canvas.id;
+        const layerIndex = parseInt(canvasId.replace('layer_canvas_', ''));
+        
+        // Convert canvas to image data URL
+        const imageDataUrl = ctx.canvas.toDataURL();
+        console.log('Processing layer with colors:', {
+            targetColor: targetColor,
+            newColor: newColor
+        });
+
+        try {
+            // Get color mapping analysis
+            const colorMapping = await colorProcessor.getColorMapping(imageDataUrl);
+            
+            // Apply color mapping
+            const processedImageUrl = await colorProcessor.applyColorMapping(
+                imageDataUrl,
+                colorMapping,
+                newColor,    // Target color to map to
+                targetColor  // Original/dominant color to replace
+            );
+            
+            // Load the processed image back to canvas
+            const img = new Image();
+            img.onload = () => {
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.drawImage(img, 0, 0);
+                
+                // Update the footer button color
+                updateFooterColorButton(layerIndex, newColor);
+                
+                resolve();
+            };
+            img.src = processedImageUrl;
+            
+        } catch (error) {
+            console.error('Error processing layer:', error);
+            resolve();
+        }
+    });
+}
+
+      function updateLayersWithNewColorCount(layerIndex){
+        console.info("layerIndex"+layerIndex);
+        const layerIndexCount = layerIndex - 1;
+        const sliderValue = document.getElementById('color-count-slider').value;
+        const totalLayers = {{ layers|length }};
+        const layers = {{ layers|safe }};
+
+        let distinctColorTolarance = 0;
+        let applicationColorTolarance = 0;
+        let lightnessApplicationColorTolarance = 0;
+        if(totalLayers>5){
+          distinctColorTolarance = 180;
+
+        }else{
+          distinctColorTolarance = 200;
+        }
+        //distinctColorTolarance = 210;
+
+        let layer = layers[layerIndexCount];
+        let img = new Image();
+        img.src = layer.path;
+        let canvas = document.getElementById('layer_canvas_'+layerIndex);
+        let ctx = canvas.getContext('2d', { willReadFrequently: true });
+        let latestImageData = null;
+        img.onload = function() {
+          const colorPickerContainer = document.getElementById('color-pickers');
+          colorPickerContainer.innerHTML = '';
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          let targetColors = [];
+          latestImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const distinctColors  = getDistinctColors(imageData,180, sliderValue);
+
+          distinctColors.forEach((color, index) => {
+          //if (color[0] !== 0 || color[1] !== 0 || color[2] !== 0) { // Ignore black
+              const button = document.createElement('button');
+              button.className = 'color-picker';
+              button.style.backgroundColor = `rgb(${color.join(',')})`;
+              document.getElementById('color-pickers').appendChild(button);
+
+              const pickr = Pickr.create({
+                el: button,
+                theme: 'nano',
+                default: `rgb(${color.join(',')})`,
+                components: {
+                    preview: true,
+                    opacity: true,
+                    hue:true,
+
+
+                    interaction: {
+                        rgba: true,
+                        input: true,
+                        hsla: true,
+                        save: true,
+                    }
+                }
+              });
+              let isProcessing = false;
+              pickr.on('save', (newColor) => {
+    if (isProcessing) return;
+    const rgbaColor = newColor.toRGBA().map(v => Math.round(v));
+
+    const currentTargetColor = distinctColors[index];
+
+    isProcessing = true;
+    processLayerAsync(ctx, currentTargetColor, rgbaColor).then(() => {
+        // Update the footer button color after processing
+        updateFooterColorButton(layerIndex, rgbaColor);
+    });
+    setTimeout(() => {
+        isProcessing = false;
+    }, 100);
+
+    latestImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    ctx.putImageData(latestImageData, 0, 0);
+
+    button.style.backgroundColor = `rgba(${rgbaColor.join(',')})`;
+    distinctColors[index] = rgbaColor.slice(0, 3);
+
+    pickr.hide();
+});
+
+          //}
+          });
+        };
+
+      }
+      async function processLayer(ctx, targetColor, newColor) {
+
+        console.info('Processing Layer with target color:', targetColor, 'and new color:', newColor);
+
+        let {
+            avgLightness,
+            avgHue,
+            hueRange,
+            lightnessTolerance,
+            hueTolerance,
+        } = analyzeImageLayer(ctx);
+
+        console.info('Layer Analysis Results:', {
+            avgLightness,
+            avgHue,
+            hueRange,
+            lightnessTolerance,
+            hueTolerance,
+        });
+        hueTolerance = 360;
+        lightnessTolerance = 1.0;
+        changeHueWithHueAndLightnessTolerance(ctx, targetColor, newColor, hueTolerance, lightnessTolerance);
+
+        const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+        const dominantColor = getDominantColor(imageData);
+
+        // Process non-dominant colors
+        processNonDominantColors(ctx, dominantColor);
+
+
+        console.info('Finished processing layer');
+                
+
+                console.info('Finished processing layer');
+              }
+
+              function isColorInArray(color, array) {
+  return array.some(existingColor =>
+    existingColor[0] === color[0] &&
+    existingColor[1] === color[1] &&
+    existingColor[2] === color[2]
+  );
+}
+      function changeHueWithHueAndLightnessTolerance(ctx, targetColor, newColor, hueTolerance, lightnessTolerance) {
+        console.info('Processing Layer with target color:', targetColor, 'and new color:', newColor);
+        const canvasWidth = ctx.canvas.width;
+        const canvasHeight = ctx.canvas.height;
+        const imageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
+        const data = imageData.data;
+
+        // Convert target and new colors to HSL
+        const targetHsl = rgbToHsl(...targetColor);
+        const newHsl = rgbToHsl(...newColor);
+
+        // Normalize hue tolerance to fraction (since hue is between 0 and 1 in HSL)
+        //const hueToleranceFraction = hueTolerance / 360;
+        const hueToleranceFraction = Math.max(0.05, hueTolerance / 360); // Minimum 5% tolerance
+        //const lightnessTolerance = Math.max(0.1, lightnessTolerance);   // Minimum 10% tolerance
+
+        for (let i = 0; i < data.length; i += 4) {
+            const currentColor = [data[i], data[i + 1], data[i + 2]];
+            const currentHsl = rgbToHsl(...currentColor);
+
+            // Calculate hue and lightness differences
+            let hueDiff = Math.abs(currentHsl[0] - targetHsl[0]);
+            if (hueDiff > 0.5) hueDiff = 1 - hueDiff; // Wrap-around for hue differences
+            const lightnessDiff = Math.abs(currentHsl[2] - targetHsl[2]);
+            //console.log(`Pixel ${i / 4}: Matches Tolerance (HueDiff: ${hueDiff}, LightnessDiff: ${lightnessDiff})`);
+            // Check if the pixel's hue and lightness are within tolerance range
+            if (hueDiff <= hueToleranceFraction && lightnessDiff <= lightnessTolerance) {
+                //const blendedRgb = hslToRgb(newHsl[0], currentHsl[1], currentHsl[2]);
+                const blendedRgb = hslToRgb(newHsl[0], currentHsl[1], currentHsl[2]);
+
+                // Scale RGB values to 0-255 and assign to data array
+                data[i] = Math.round(blendedRgb[0] * 255);
+                data[i + 1] = Math.round(blendedRgb[1] * 255);
+                data[i + 2] = Math.round(blendedRgb[2] * 255);
+            }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+      }
+
+
+      
+      function changeHueWithHueAndLightnessTolerance(ctx, targetColor, newColor, hueTolerance, lightnessTolerance) {
+  console.info('Processing Layer with target color:', targetColor, 'and new color:', newColor);
+  const canvasWidth = ctx.canvas.width;
+  const canvasHeight = ctx.canvas.height;
+  const imageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
+  const data = imageData.data;
+
+  // Convert target and new colors to HSL
+  const targetHsl = rgbToHsl(...targetColor);
+  const newHsl = rgbToHsl(...newColor);
+
+  // Normalize hue tolerance to fraction (since hue is between 0 and 1 in HSL)
+  const hueToleranceFraction = hueTolerance / 360; // Strict hue tolerance
+  const lightnessTolerance1 = Math.max(0.05, lightnessTolerance); // Minimum 5% lightness tolerance
+  const minSaturation = 0.1; // Minimum saturation threshold
+
+  for (let i = 0; i < data.length; i += 4) {
+    const currentColor = [data[i], data[i + 1], data[i + 2]];
+    const currentHsl = rgbToHsl(...currentColor);
+
+    // Skip desaturated colors
+    if (currentHsl[1] < minSaturation) continue;
+
+    // Calculate hue and lightness differences
+    let hueDiff = Math.abs(currentHsl[0] - targetHsl[0]);
+    if (hueDiff > 0.5) hueDiff = 1 - hueDiff; // Wrap-around for hue differences
+    const lightnessDiff = Math.abs(currentHsl[2] - targetHsl[2]);
+
+    // Check if the pixel's hue and lightness are within tolerance range
+    if (hueDiff <= hueToleranceFraction && lightnessDiff <= lightnessTolerance1) {
+      const blendedRgb = hslToRgb(newHsl[0], currentHsl[1], currentHsl[2]);
+
+      // Scale RGB values to 0-255 and assign to data array
+      data[i] = Math.round(blendedRgb[0] * 255);
+      data[i + 1] = Math.round(blendedRgb[1] * 255);
+      data[i + 2] = Math.round(blendedRgb[2] * 255);
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+}
+
+
+function updateColorCountDisplay() {
+         const sliderValue = document.getElementById('color-count-slider').value;
+         document.getElementById('color-count-display').innerText = sliderValue;
+
+       }
+
+        {% comment %} // Helper function to calculate color distance
+       function colorDistance(color1, color2) {
+         return Math.sqrt(
+             Math.pow(color1[0] - color2[0], 2) +
+             Math.pow(color1[1] - color2[1], 2) +
+             Math.pow(color1[2] - color2[2], 2)
+         );
+       } {% endcomment %}
+
+ 
+       // Function to convert RGB to HSL
+       function rgbToHsl(r, g, b) {
+         r /= 255;
+         g /= 255;
+         b /= 255;
+
+         const max = Math.max(r, g, b);
+         const min = Math.min(r, g, b);
+         let h, s, l = (max + min) / 2;
+
+         if (max === min) {
+             h = s = 0; // Achromatic
+         } else {
+             const d = max - min;
+             s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+             switch (max) {
+                 case r:
+                     h = (g - b) / d + (g < b ? 6 : 0);
+                     break;
+                 case g:
+                     h = (b - r) / d + 2;
+                     break;
+                 case b:
+                     h = (r - g) / d + 4;
+                     break;
+             }
+
+             h /= 6;
+         }
+
+         return [h, s, l];
+       }
+       async function generatePallateColors() {
+        updateColorCountDisplay();
+        const layerIndex = contextMenu.dataset.layerIndex;
+        const layerIndexCount = layerIndex - 1;
+        const sliderValue = document.getElementById('color-count-slider').value;
+    
+        const layers = {{ layers|safe }};
+        let layer = layers[layerIndexCount];
+        let img = new Image();
+        img.src = layer.path;
+        let canvas = document.getElementById('layer_canvas_'+layerIndex);
+        let ctx = canvas.getContext('2d', { willReadFrequently: true });
+        let latestImageData = null;
+    
+        img.onload = async function() {
+            const colorPickerContainer = document.getElementById('color-pickers');
+            colorPickerContainer.innerHTML = '';
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+    
+            // Create ImageColorAnalyzer instance
+            const analyzer = new ImageColorAnalyzer();
+            const colorAnalysis = await analyzer.analyzeImageColors(img);
+    
+            // Get all colors including dominant and other colors
+            let distinctColors = [colorAnalysis.dominantColor];
+            if (colorAnalysis.otherColors) {
+                colorAnalysis.otherColors.forEach(color => {
+                    distinctColors.push(color.rgb);
+                });
+            }
+    
+            // Store original colors
+            window.originalColors = [...distinctColors];
+    
+            // Limit colors based on slider value
+            distinctColors = distinctColors.slice(0, parseInt(sliderValue));
+    
+            // Create color pickers for each distinct color
+            distinctColors.forEach((color, index) => {
+                const button = document.createElement('button');
+                button.className = 'color-picker';
+                button.style.backgroundColor = `rgb(${color.join(',')})`;
+                
+                // Get color name using analyzer
+                const colorName = analyzer.getColorGroup(...color);
+                button.title = colorName;
+                
+                document.getElementById('color-pickers').appendChild(button);
+    
+                const pickr = Pickr.create({
+                    el: button,
+                    theme: 'nano',
+                    default: `rgb(${color.join(',')})`,
+                    components: {
+                        preview: true,
+                        opacity: true,
+                        hue: true,
+                        interaction: {
+                            rgba: true,
+                            input: true,
+                            hsla: true,
+                            save: true,
+                        }
+                    }
+                });
+    
+                let isProcessing = false;
+                pickr.on('save', async (newColor) => {
+                    if (isProcessing) return;
+                    const rgbaColor = newColor.toRGBA().map(v => Math.round(v));
+                    const currentTargetColor = distinctColors[index];
+    
+                    isProcessing = true;
+                    await processLayerAsync(ctx, currentTargetColor, rgbaColor);
+                    
+                    button.style.backgroundColor = `rgba(${rgbaColor.join(',')})`;
+                    distinctColors[index] = rgbaColor.slice(0, 3);
+    
+                    isProcessing = false;
+                    pickr.hide();
+                });
+            });
+    
+            // Create a shuffle button for this color set
+            const shuffleButton = document.createElement('button');
+            shuffleButton.className = 'btn btn-sm btn-secondary mt-2';
+            shuffleButton.innerHTML = '<i class="bi bi-shuffle"></i> Shuffle Colors';
+            shuffleButton.onclick = async () => {
+                const newColorAnalysis = await analyzer.analyzeImageColors(img);
+                const newColors = [newColorAnalysis.dominantColor];
+                
+                if (newColorAnalysis.otherColors) {
+                    newColorAnalysis.otherColors.forEach(color => {
+                        if (newColors.length < distinctColors.length) {
+                            newColors.push(color.rgb);
+                        }
+                    });
+                }
+    
+                // Update existing color pickers with new colors
+                const colorPickers = document.querySelectorAll('#color-pickers .color-picker');
+                colorPickers.forEach((picker, index) => {
+                    if (newColors[index]) {
+                        picker.style.backgroundColor = `rgb(${newColors[index].join(',')})`;
+                        distinctColors[index] = newColors[index];
+                    }
+                });
+            };
+            
+            document.getElementById('color-pickers').appendChild(shuffleButton);
+        };
+    }
+
+async function processPallet(layerCtx, totalLayers, layerCanvas, currentLayerIndex, oldColorArray, trendingColors) {
+  const loadingScreen = document.getElementById('loading-screen');
+  loadingScreen.style.display = 'block';
+  const analyzer = new ImageColorAnalyzer();
+  const colorProcessor = new ColorProcessor();
+
+  try {
+      for (let layer = 1; layer <= totalLayers; layer++) {
+          // Check if this layer's color is locked
+          const colorButton = document.querySelector(`.color-picker[data-layer-index="${layer-1}"]`);
+          if (colorButton && colorButton.dataset.locked === 'true') {
+              console.log(`Layer ${layer} is locked, skipping processing`);
+              continue;
+          }
+
+          console.info(`Processing Layer ${layer}/${totalLayers}`);
+
+          const layerCanvas = document.getElementById(`layer_canvas_${layer}`);
+          if (!layerCanvas) continue;
+
+          const layerCtx = layerCanvas.getContext('2d');
+          if (!layerCtx) continue;
+
+          // Load and draw original image first
+          const originalImg = new Image();
+          const originalSrc = layerCanvas.getAttribute('data-original-src');
+          if (!originalSrc) {
+              console.error(`Original source not found for layer ${layer}`);
+              continue;
+          }
+          originalImg.src = originalSrc;
+          
+          await new Promise((resolve, reject) => {
+              originalImg.onload = () => {
+                  layerCtx.clearRect(0, 0, layerCanvas.width, layerCanvas.height);
+                  layerCtx.drawImage(originalImg, 0, 0);
+                  resolve();
+              };
+              originalImg.onerror = () => {
+                  console.error(`Failed to load original image for layer ${layer}`);
+                  reject(new Error(`Failed to load original image for layer ${layer}`));
+              };
+          });
+
+          const tempImage = new Image();
+          tempImage.src = layerCanvas.toDataURL('image/png');
+          const base64Data = layerCanvas.toDataURL('image/png');
+          
+          await new Promise((resolve) => {
+              tempImage.onload = resolve;
+          });
+
+          const colorAnalysis = await analyzer.analyzeImageColors(tempImage);
+
+          if (!colorAnalysis) {
+              console.error('Color analysis failed');
+              continue;
+          }
+
+          // Process dominant color
+          console.log(`Dominant Color Name: ${colorAnalysis.dominantColorName}`);
+          const colorIndex = (layer - 1) % trendingColors.length;
+          const targetColor = trendingColors[colorIndex];
+
+          // Use ColorProcessor for dominant color
+          const colorMapping = await colorProcessor.getColorMapping(base64Data);
+          const modifiedImage = await colorProcessor.applyColorMapping(
+              base64Data, 
+              colorMapping, 
+              targetColor,
+              colorAnalysis.dominantColor
+          );
+          updateFooterColorButton(layer, targetColor);
+
+          // Apply the modified image to the canvas and wait for it to load
+          await new Promise((resolve) => {
+              const img = new Image();
+              img.onload = () => {
+                  layerCtx.clearRect(0, 0, layerCanvas.width, layerCanvas.height);
+                  layerCtx.drawImage(img, 0, 0);
+                  resolve();
+              };
+              img.src = modifiedImage;
+          });
+
+          // Get updated canvas data after dominant color modification
+          const updatedImage = new Image();
+          updatedImage.src = layerCanvas.toDataURL('image/png');
+          await new Promise((resolve) => {
+              updatedImage.onload = resolve;
+          });
+
+          // Analyze updated colors after dominant color change
+          const updatedColorAnalysis = await analyzer.analyzeImageColors(updatedImage);
+
+          // Process other colors using updated color analysis
+          if (updatedColorAnalysis.otherColors && updatedColorAnalysis.otherColors.length > 0) {
+              console.log('Processing Other Colors:', updatedColorAnalysis.otherColors.length);
+              const isBlack = (rgb) => {
+                  return rgb[0] <= 30 && rgb[1] <= 30 && rgb[2] <= 30;
+              };
+              
+              const colorsToProcess = updatedColorAnalysis.otherColors.filter(color => {
+                  return !isBlack(color.rgb) && 
+                         !isColorInArray(color.rgb, trendingColors) && 
+                         color.percentage > 1.0;
+              });
+              
+              if (colorsToProcess.length > 0) {
+                  console.log('Processing secondary colors:');
+                  for (const color of colorsToProcess) {
+                      console.log(`Processing Color: ${color.colorName}, RGB: ${color.rgb}, Percentage: ${color.percentage.toFixed(2)}%`);
+                      const targetColorIndex = (trendingColors.indexOf(targetColor) + 1) % trendingColors.length;
+                      await processLayerAsync(layerCtx, color.rgb, trendingColors[targetColorIndex]);
+                  }
+              }
+          } else {
+              console.log('No other colors found for this layer.');
+          }
+      }
+  } catch (error) {
+      console.error("Error while processing pallet:", error);
+  } finally {
+      loadingScreen.style.display = 'none';
+  }
+}
+function isColorInArray(color, colorArray) {
+    return colorArray.some(arrayColor => {
+        const tolerance = 32;
+        return Math.abs(arrayColor[0] - color[0]) <= tolerance &&
+               Math.abs(arrayColor[1] - color[1]) <= tolerance &&
+               Math.abs(arrayColor[2] - color[2]) <= tolerance;
+    });
+}
+function getRandomColor() {
+  const r = Math.floor(Math.random() * 256);
+  const g = Math.floor(Math.random() * 256);
+  const b = Math.floor(Math.random() * 256);
+  return [r, g, b];
+}
+function processNonDominantColors(ctx, dominantColor) {
+    if (!dominantColor || !dominantColor.nonDominantColors || dominantColor.nonDominantColors.length === 0) {
+        console.log('No non-dominant colors found');
+        return;
+    }
+
+    console.log('Non-dominant colors:', dominantColor.nonDominantColors);
+
+    const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+    const data = imageData.data;
+
+    // Analyze the current layer for dynamic thresholds
+    const analysis = analyzeImageLayer(ctx);
+    const { hueTolerance, lightnessTolerance } = analysis;
+
+    for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
+
+        if (a === 0) continue; // Skip fully transparent pixels
+
+        const currentColor = [r, g, b];
+
+        // Check if the current color is a non-dominant color
+        if (!isColorInArray(currentColor, dominantColor.nonDominantColors)) continue;
+
+        // Convert current color to HSL
+        const currentHsl = rgbToHsl(r, g, b);
+
+        // Calculate hue and lightness differences from the dominant color
+        const dominantHsl = rgbToHsl(...dominantColor.referenceColor);
+        const hueDiff = Math.abs(currentHsl[0] - dominantHsl[0]);
+        const lightnessDiff = Math.abs(currentHsl[2] - dominantHsl[2]);
+
+        // Check if the pixel's hue and lightness are within tolerance range
+        if (
+            hueDiff <= hueTolerance / 360 && // Normalize hue tolerance
+            lightnessDiff <= lightnessTolerance
+        ) {
+            const randomColor = getRandomColor();
+            console.log('Replacing non-dominant color', currentColor, 'with', randomColor);
+            data[i] = randomColor[0];
+            data[i + 1] = randomColor[1];
+            data[i + 2] = randomColor[2];
+        }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+}
+
+function updateFooterColorButton(layerIndex, newColor) {
+    const colorButton = document.querySelector(`.color-picker[data-layer-index="${layerIndex-1}"]`);
+    if (colorButton) {
+        colorButton.style.backgroundColor = Array.isArray(newColor) ? 
+            `rgb(${newColor.join(',')})` : newColor;
+    }
+}
+class ImageColorAnalyzer {
+    constructor() {
+        this.logger = console;
+        this.cv = null;
+        this.isReady = false;
+        this.initializationPromise = null;
+    }
+
+    async initialize() {
+        // If already initialized, return
+        if (this.isReady) return;
+
+        // If initialization is in progress, return the existing promise
+        if (this.initializationPromise) {
+            return this.initializationPromise;
+        }
+
+        this.initializationPromise = new Promise((resolve, reject) => {
+            // Check if OpenCV is already loaded
+            if (typeof cv !== 'undefined') {
+                this.cv = cv;
+                this.isReady = true;
+                resolve();
+                return;
+            }
+
+            // Check if the script is already being loaded
+            const existingScript = document.querySelector('script[src*="opencv.js"]');
+            if (existingScript) {
+                existingScript.addEventListener('load', () => {
+                    this.cv = cv;
+                    this.isReady = true;
+                    resolve();
+                });
+                existingScript.addEventListener('error', () => {
+                    reject(new Error('Failed to load OpenCV.js'));
+                });
+                return;
+            }
+
+            // Load OpenCV if not already loading
+            const script = document.createElement('script');
+            script.src = 'https://docs.opencv.org/4.8.0/opencv.js';
+            script.async = true;
+            script.type = 'text/javascript';
+
+            // Only set Module if it's not already defined
+            if (typeof window.Module === 'undefined') {
+                window.Module = {
+                    onRuntimeInitialized: () => {
+                        this.cv = cv;
+                        this.isReady = true;
+                        resolve();
+                    }
+                };
+            }
+
+            script.onerror = () => {
+                reject(new Error('Failed to load OpenCV.js'));
+            };
+
+            document.body.appendChild(script);
+        });
+
+        return this.initializationPromise;
+    }
+
+    rgbToLab(r, g, b) {
+        // Convert RGB to XYZ
+        r = r / 255;
+        g = g / 255;
+        b = b / 255;
+
+        // RGB to XYZ conversion
+        r = r > 0.04045 ? Math.pow((r + 0.055) / 1.055, 2.4) : r / 12.92;
+        g = g > 0.04045 ? Math.pow((g + 0.055) / 1.055, 2.4) : g / 12.92;
+        b = b > 0.04045 ? Math.pow((b + 0.055) / 1.055, 2.4) : b / 12.92;
+
+        r *= 100;
+        g *= 100;
+        b *= 100;
+
+        const x = r * 0.4124 + g * 0.3576 + b * 0.1805;
+        const y = r * 0.2126 + g * 0.7152 + b * 0.0722;
+        const z = r * 0.0193 + g * 0.1192 + b * 0.9505;
+
+        // XYZ to Lab conversion
+        const xn = 95.047;
+        const yn = 100.000;
+        const zn = 108.883;
+
+        const fx = x / xn > 0.008856 ? Math.pow(x / xn, 1/3) : (7.787 * x / xn) + 16/116;
+        const fy = y / yn > 0.008856 ? Math.pow(y / yn, 1/3) : (7.787 * y / yn) + 16/116;
+        const fz = z / zn > 0.008856 ? Math.pow(z / zn, 1/3) : (7.787 * z / zn) + 16/116;
+
+        const L = (116 * fy) - 16;
+        const a = 500 * (fx - fy);
+        const b_val = 200 * (fy - fz);
+
+        return [L, a, b_val];
+    }
+
+    calculateColorDifference(lab1, lab2) {
+        // Delta E 2000 calculation (simplified version)
+        const deltaL = lab2[0] - lab1[0];
+        const deltaA = lab2[1] - lab1[1];
+        const deltaB = lab2[2] - lab1[2];
+
+        return Math.sqrt(
+            Math.pow(deltaL, 2) +
+            Math.pow(deltaA, 2) +
+            Math.pow(deltaB, 2)
+        );
+    }
+
+    async analyzeImageColors(imageElement) {
+        if (!this.isReady) {
+            await this.initialize();
+        }
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = imageElement.width;
+        canvas.height = imageElement.height;
+        ctx.drawImage(imageElement, 0, 0);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const pixels = imageData.data;
+
+        // Store colors with their frequency and LAB values
+        const colorMap = new Map();
+        const totalPixels = pixels.length / 4;
+
+        // Sample pixels (analyze every 4th pixel for performance)
+        for (let i = 0; i < pixels.length; i += 16) {
+            const r = pixels[i];
+            const g = pixels[i + 1];
+            const b = pixels[i + 2];
+            const a = pixels[i + 3];
+
+            // Skip transparent pixels
+            if (a < 127) continue;
+
+            const key = `${r},${g},${b}`;
+            const lab = this.rgbToLab(r, g, b);
+
+            if (colorMap.has(key)) {
+                colorMap.get(key).count++;
+            } else {
+                colorMap.set(key, {
+                    rgb: [r, g, b],
+                    lab: lab,
+                    count: 1
+                });
+            }
+        }
+
+        // Convert map to array for processing
+        let colors = Array.from(colorMap.values());
+
+        // Merge similar colors
+        const mergedColors = [];
+        const threshold = 5; // Color difference threshold
+
+        while (colors.length > 0) {
+            const baseColor = colors[0];
+            let totalCount = baseColor.count;
+            const similarColors = [baseColor];
+
+            // Find and merge similar colors
+            for (let i = 1; i < colors.length; i++) {
+                const diff = this.calculateColorDifference(baseColor.lab, colors[i].lab);
+                if (diff < threshold) {
+                    totalCount += colors[i].count;
+                    similarColors.push(colors[i]);
+                }
+            }
+
+            // Calculate weighted average color
+            const avgColor = similarColors.reduce((acc, curr) => {
+                const weight = curr.count / totalCount;
+                return {
+                    rgb: [
+                        acc.rgb[0] + curr.rgb[0] * weight,
+                        acc.rgb[1] + curr.rgb[1] * weight,
+                        acc.rgb[2] + curr.rgb[2] * weight
+                    ]
+                };
+            }, { rgb: [0, 0, 0] });
+
+            mergedColors.push({
+                rgb: avgColor.rgb.map(Math.round),
+                percentage: (totalCount / (totalPixels / 4)) * 100
+            });
+
+            // Remove processed colors
+            colors = colors.filter(c => !similarColors.includes(c));
+        }
+
+        // Sort by percentage and group by basic color categories
+        const colorGroups = {};
+        
+        mergedColors.sort((a, b) => b.percentage - a.percentage)
+            .forEach(color => {
+                const colorGroup = this.getColorGroup(...color.rgb);
+                
+                if (!colorGroups[colorGroup]) {
+                    colorGroups[colorGroup] = {
+                        totalPercentage: 0,
+                        shades: []
+                    };
+                }
+
+                colorGroups[colorGroup].shades.push({
+                    rgb: color.rgb,
+                    percentage: color.percentage
+                });
+                colorGroups[colorGroup].totalPercentage += color.percentage;
+            });
+
+        // Sort and format results
+        const sortedGroups = Object.entries(colorGroups)
+            .map(([name, data]) => ({
+                name,
+                totalPercentage: data.totalPercentage,
+                dominantShade: data.shades.sort((a, b) => b.percentage - a.percentage)[0]
+            }))
+            .sort((a, b) => b.totalPercentage - a.totalPercentage);
+
+        const dominantGroup = sortedGroups[0];
+        const otherColors = sortedGroups.slice(1, 5).map(group => ({
+            colorName: group.name,
+            rgb: group.dominantShade.rgb,
+            percentage: group.totalPercentage
+        }));
+
+        // Console log results
+     
+        // console.log('Dominant Color:', {
+        //     name: dominantGroup.name,
+        //     rgb: dominantGroup.dominantShade.rgb,
+        //     percentage: dominantGroup.totalPercentage.toFixed(2) + '%'
+        // });
+
+
+        // otherColors.forEach((color, index) => {
+        //     console.log(`Color ${index + 1}:`, {
+        //         name: color.colorName,
+        //         rgb: color.rgb,
+        //         percentage: color.percentage.toFixed(2) + '%'
+        //     });
+        // });
+
+        const [h, s, l] = this.rgbToHsl(...dominantGroup.dominantShade.rgb);
+
+        return {
+            dominantColor: dominantGroup.dominantShade.rgb,
+            dominantColorName: dominantGroup.name,
+            dominantPercentage: dominantGroup.totalPercentage,
+            otherColors: otherColors,
+            hue: h * 360,
+            saturation: s * 100,
+            lightness: l * 100
+        };
+    }
+
+    rgbToHsl(r, g, b) {
+        r /= 255;
+        g /= 255;
+        b /= 255;
+
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+
+        if (max === min) {
+            h = s = 0;
+        } else {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+
+            h /= 6;
+        }
+
+        return [h, s, l];
+    }
+
+    getColorGroup(r, g, b) {
+    const [h, s, l] = this.rgbToHsl(r, g, b);
+    const hue = h * 360;
+
+    // Define color ranges by hue
+    if (l < 0.1) return 'black';
+    if (l > 0.9 && s < 0.1) return 'white';
+    if (s < 0.15 && l > 0.1 && l < 0.9) return 'gray';
+
+    // Hue-based color grouping
+    if ((hue >= 345 || hue <= 10) && s > 0.15) return 'red';
+    if (hue > 10 && hue <= 45) return 'orange';
+    if (hue > 45 && hue <= 65) return 'yellow';
+    if (hue > 65 && hue <= 170) return 'green';
+    if (hue > 170 && hue <= 190) return 'cyan';
+    if (hue > 190 && hue <= 260) return 'blue';
+    if (hue > 260 && hue <= 320) return 'magenta';
+    if (hue > 320 && hue <= 345) return 'purple';
+
+    return 'other';
+}
+}
+
+class ColorProcessor {
+  constructor() {
+        this.EPSILON = 0.0001;
+        this.COLOR_SIMILARITY_THRESHOLD = 30;
+        this.COLOR_QUANTIZATION_STEP = 10; // Added for color quantization
+        this.cv = null; // Will store OpenCV instance
+        
+        // Bind methods
+        this.applyColorMapping = this.applyColorMapping.bind(this);
+   
+       
+        this.rgbToHsv = this.rgbToHsv.bind(this);
+        this.hsvToRgb = this.hsvToRgb.bind(this);
+        this.quantizeColor = this.quantizeColor.bind(this)
+    }
+
+    rgbToLab(rgb) {
+      // First, convert RGB to XYZ using D65 illuminant
+      let r = rgb[0] / 255;
+      let g = rgb[1] / 255;
+      let b = rgb[2] / 255;
+
+      // Convert to sRGB space
+      r = r > 0.04045 ? Math.pow((r + 0.055) / 1.055, 2.4) : r / 12.92;
+      g = g > 0.04045 ? Math.pow((g + 0.055) / 1.055, 2.4) : g / 12.92;
+      b = b > 0.04045 ? Math.pow((b + 0.055) / 1.055, 2.4) : b / 12.92;
+
+      // Convert to XYZ space
+      const x = (r * 0.4124564 + g * 0.3575761 + b * 0.1804375) * 100;
+      const y = (r * 0.2126729 + g * 0.7151522 + b * 0.0721750) * 100;
+      const z = (r * 0.0193339 + g * 0.1191920 + b * 0.9503041) * 100;
+
+      // Convert XYZ to Lab
+      const xn = 95.047;
+      const yn = 100.000;
+      const zn = 108.883;
+
+      const fx = x / xn > 0.008856 ? Math.pow(x / xn, 1/3) : (903.3 * x / xn + 16) / 116;
+      const fy = y / yn > 0.008856 ? Math.pow(y / yn, 1/3) : (903.3 * y / yn + 16) / 116;
+      const fz = z / zn > 0.008856 ? Math.pow(z / zn, 1/3) : (903.3 * z / zn + 16) / 116;
+
+      const L = Math.max(0, 116 * fy - 16);
+      const a = 500 * (fx - fy);
+      const c = 200 * (fy - fz);
+
+      return [L, a, c];
+  }
+
+  rgbToHsv(rgb) {
+        const r = rgb[0] / 255;
+        const g = rgb[1] / 255;
+        const b = rgb[2] / 255;
+        
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        const diff = max - min;
+        
+        let h = 0;
+        if (max === min) {
+            h = 0;
+        } else if (max === r) {
+            h = (60 * ((g - b) / diff) + 360) % 360;
+        } else if (max === g) {
+            h = (60 * ((b - r) / diff) + 120) % 360;
+        } else {
+            h = (60 * ((r - g) / diff) + 240) % 360;
+        }
+        
+        const s = max === 0 ? 0 : diff / max;
+        const v = max;
+        
+        return [h, s, v];
+    }
+
+
+
+
+
+
+
+   
+    isColorSimilar(color1, color2) {
+    const hsv1 = this.rgbToHsv(color1);
+    const hsv2 = this.rgbToHsv(color2);
+    
+    // Calculate hue difference
+    let hueDiff = Math.abs(hsv1[0] - hsv2[0]);
+    if (hueDiff > 180) hueDiff = 360 - hueDiff;
+    
+    // Make the similarity check more strict
+    const saturationThreshold = (hsv1[1] < 0.1 || hsv2[1] < 0.1) ? 0.1 : 0.2;
+    
+    return (
+        (hueDiff < 20 || (hsv1[1] < 0.1 && hsv2[1] < 0.1)) && // Stricter hue check
+        Math.abs(hsv1[1] - hsv2[1]) < saturationThreshold && 
+        Math.abs(hsv1[2] - hsv2[2]) < 0.3
+    );
+}
+quantizeColor(rgb) {
+    return rgb.map(v => Math.round(v / this.COLOR_QUANTIZATION_STEP) * this.COLOR_QUANTIZATION_STEP);
+}
+    calculateColorDistance(lab1, lab2) {
+        return Math.sqrt(
+            Math.pow(lab1[0] - lab2[0], 2) +
+            Math.pow(lab1[1] - lab2[1], 2) +
+            Math.pow(lab1[2] - lab2[2], 2)
+        );
+    }
+
+    findSimilarColors(currentLab, shades, threshold = 25) {
+        return shades.filter(shade => 
+            this.calculateColorDistance(currentLab, shade.lab) < threshold
+        );
+    }
+
+    async getColorMapping(imageData) {
+    // Import tinycolor2 dynamically if not already loaded
+    if (typeof tinycolor === 'undefined') {
+        await new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/tinycolor/1.4.2/tinycolor.min.js';
+            script.onload = resolve;
+            document.head.appendChild(script);
+        });
+    }
+
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imgData.data;
+            
+            const colorMap = new Map();
+            const validPixels = [];
+            
+            for (let i = 0; i < pixels.length; i += 4) {
+                if (pixels[i + 3] > 128) {
+                    const rgb = [pixels[i], pixels[i + 1], pixels[i + 2]];
+                    const color = tinycolor({ r: rgb[0], g: rgb[1], b: rgb[2] });
+                    
+                    // Skip colors with very low saturation or extreme brightness
+                    const hsl = color.toHsl();
+                    if (hsl.s < 0.15 || hsl.l < 0.1 || hsl.l > 0.9) {
+                        continue;
+                    }
+
+                    const quantizedRgb = this.quantizeColor(rgb);
+                    const key = quantizedRgb.join(',');
+                    colorMap.set(key, (colorMap.get(key) || 0) + 1);
+                    validPixels.push(rgb);
+                }
+            }
+
+            if (colorMap.size === 0) {
+                resolve({
+                    baseColor: [0, 0, 0],
+                    shades: []
+                });
+                return;
+            }
+
+            // Get unique colors and their Lab values
+            const shades = Array.from(colorMap.keys()).map(key => {
+                const rgb = key.split(',').map(Number);
+                const color = tinycolor({ r: rgb[0], g: rgb[1], b: rgb[2] });
+                return {
+                    original: rgb,
+                    lab: this.rgbToLab(rgb),
+                    frequency: colorMap.get(key),
+                    hsv: color.toHsv(),
+                    brightness: color.getBrightness(),
+                };
+            });
+
+            // Enhanced sorting considering both frequency and color properties
+            shades.sort((a, b) => {
+                const freqWeight = 0.7;
+                const satWeight = 0.3;
+                
+                const aScore = (a.frequency * freqWeight) + (a.hsv.s * satWeight * 100);
+                const bScore = (b.frequency * freqWeight) + (b.hsv.s * satWeight * 100);
+                
+                return bScore - aScore;
+            });
+
+            const baseColor = shades[0].original;
+
+            resolve({
+                baseColor,
+                shades
+            });
+        };
+        img.src = imageData;
+    });
+}
+async applyColorMapping(imageData, colorMapping, targetColor, dominantColor) {
+  return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+          const canvasElement = document.createElement('canvas');
+          const ctx = canvasElement.getContext('2d');
+          canvasElement.width = img.width;
+          canvasElement.height = img.height;
+
+          ctx.drawImage(img, 0, 0);
+          const imageDataObj = ctx.getImageData(0, 0, img.width, img.height);
+          const data = imageDataObj.data;
+
+          function rgbToHsl(r, g, b) {
+              r /= 255; g /= 255; b /= 255;
+              const max = Math.max(r, g, b);
+              const min = Math.min(r, g, b);
+              let h, s, l = (max + min) / 2;
+
+              if (max === min) {
+                  h = s = 0;
+              } else {
+                  const d = max - min;
+                  s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                  switch (max) {
+                      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                      case g: h = (b - r) / d + 2; break;
+                      case b: h = (r - g) / d + 4; break;
+                  }
+                  h /= 6;
+              }
+              return [h * 360, s * 100, l * 100];
+          }
+
+          function hslToRgb(h, s, l) {
+              h /= 360; s /= 100; l /= 100;
+              let r, g, b;
+
+              if (s === 0) {
+                  r = g = b = l;
+              } else {
+                  const hue2rgb = (p, q, t) => {
+                      if (t < 0) t += 1;
+                      if (t > 1) t -= 1;
+                      if (t < 1/6) return p + (q - p) * 6 * t;
+                      if (t < 1/2) return q;
+                      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                      return p;
+                  };
+
+                  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                  const p = 2 * l - q;
+                  r = hue2rgb(p, q, h + 1/3);
+                  g = hue2rgb(p, q, h);
+                  b = hue2rgb(p, q, h - 1/3);
+              }
+              return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+          }
+
+          const dominantHSL = rgbToHsl(...dominantColor);
+          const targetHSL = rgbToHsl(...targetColor);
+          const tolerance = 35;
+
+          for (let i = 0; i < data.length; i += 4) {
+              if (data[i + 3] < 128) continue; // Skip transparent pixels
+
+              const r = data[i];
+              const g = data[i + 1];
+              const b = data[i + 2];
+
+ 
+              const pixelHSL = rgbToHsl(r, g, b);
+              let hueDifference = Math.abs(pixelHSL[0] - dominantHSL[0]);
+              if (hueDifference > 180) hueDifference = 360 - hueDifference;
+              
+              const isGrayOrWhite = pixelHSL[1] < 15 && pixelHSL[2] > 100;
+              const dominantIsGrayOrWhite = dominantHSL[1] < 15 && dominantHSL[2] > 100;
+
+              if (hueDifference < tolerance || 
+                  (isGrayOrWhite && dominantIsGrayOrWhite && 
+                   Math.abs(pixelHSL[2] - dominantHSL[2]) < 30 && 
+                   Math.abs(pixelHSL[1] - dominantHSL[1]) < 15)) {
+                  
+                  const brightnessRatio = pixelHSL[2] / dominantHSL[2];
+                  let adjustedLightness = targetHSL[2] * brightnessRatio;
+
+                  if (pixelHSL[2] > dominantHSL[2]) {
+                      adjustedLightness = Math.max(adjustedLightness, targetHSL[2] * 0.9);
+                  }
+                  
+                  adjustedLightness = Math.max(10, Math.min(100, adjustedLightness));
+
+                  const saturation = Math.abs(pixelHSL[1] - dominantHSL[1]) < 5 ? 
+                      targetHSL[1] : 
+                      pixelHSL[1] * (targetHSL[1] / dominantHSL[1]);
+
+                  const newRGB = hslToRgb(
+                      targetHSL[0],
+                      Math.max(0, Math.min(100, saturation)),
+                      adjustedLightness
+                  );
+
+                  data[i] = newRGB[0];
+                  data[i + 1] = newRGB[1];
+                  data[i + 2] = newRGB[2];
+              }
+          }
+
+          ctx.putImageData(imageDataObj, 0, 0);
+          const dataUrl = canvasElement.toDataURL('image/png');
+          resolve(dataUrl);
+      };
+      img.src = imageData;
+  });
+}
+// Helper functions
+calculateDeltaE(lab1, lab2) {
+    const deltaL = lab1[0] - lab2[0];
+    const deltaA = lab1[1] - lab2[1];
+    const deltaB = lab1[2] - lab2[2];
+    return Math.sqrt(deltaL * deltaL + deltaA * deltaA + deltaB * deltaB);
+}
+
+hsvToRgb(hsv) {
+    let h = hsv[0];
+    let s = hsv[1];
+    let v = hsv[2];
+    
+    let r, g, b;
+    const i = Math.floor(h * 6);
+    const f = h * 6 - i;
+    const p = v * (1 - s);
+    const q = v * (1 - f * s);
+    const t = v * (1 - (1 - f) * s);
+
+    switch (i % 6) {
+        case 0: r = v; g = t; b = p; break;
+        case 1: r = q; g = v; b = p; break;
+        case 2: r = p; g = v; b = t; break;
+        case 3: r = p; g = q; b = v; break;
+        case 4: r = t; g = p; b = v; break;
+        case 5: r = v; g = p; b = q; break;
+    }
+
+    return [
+        Math.round(r * 255),
+        Math.round(g * 255),
+        Math.round(b * 255)
+    ];
+}
+
+}
+
+class ImageAdjuster {
+  constructor() {
+        this.adjustments = {
+            combined: {
+                hue: 0,
+                saturation: 0,
+                brightness: 0,
+                temperature: 0
+            }
+        };
+        this.showIndividualLayers = false;
+        this.setupEventListeners();
+        this.originalImageData = {}; // Change to object to store data for each layer
+    }
+
+    setupEventListeners() {
+        const toggleButton = document.getElementById('adjustmentToggle');
+        const adjustmentPanel = document.getElementById('adjustmentPanel');
+
+        toggleButton.addEventListener('click', () => {
+            const isHidden = adjustmentPanel.style.display === 'none';
+            adjustmentPanel.style.display = isHidden ? 'block' : 'none';
+            if (isHidden) {
+                this.createAdjustmentSliders();
+            }
+        });
+    }
+
+    createAdjustmentSliders() {
+        const container = document.querySelector('.sliders-container');
+        container.innerHTML = '';
+
+        // Add toggle button for individual layers
+        const toggleLayersBtn = document.createElement('button');
+        toggleLayersBtn.textContent = this.showIndividualLayers ? 'Show Combined Layer' : 'Show Individual Layers';
+        toggleLayersBtn.className = 'toggle-layers-btn';
+        toggleLayersBtn.style.cssText = `
+            margin-bottom: 15px;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        `;
+        toggleLayersBtn.addEventListener('click', () => {
+            this.showIndividualLayers = !this.showIndividualLayers;
+            this.createAdjustmentSliders();
+        });
+        container.appendChild(toggleLayersBtn);
+
+        if (!this.showIndividualLayers) {
+            // Create combined layer controls
+            const combinedDiv = document.createElement('div');
+            combinedDiv.className = 'layer-adjustments';
+            combinedDiv.innerHTML = `
+                <h4>All Layers</h4>
+                <div class="slider-group">
+                    <label>Hue</label>
+                    <input type="range" min="-180" max="180" value="${this.adjustments.combined.hue}" 
+                           data-layer="combined" data-adjustment="hue">
+                </div>
+                <div class="slider-group">
+                    <label>Saturation</label>
+                    <input type="range" min="-100" max="100" value="${this.adjustments.combined.saturation}" 
+                           data-layer="combined" data-adjustment="saturation">
+                </div>
+                <div class="slider-group">
+                    <label>Brightness</label>
+                    <input type="range" min="-100" max="100" value="${this.adjustments.combined.brightness}" 
+                           data-layer="combined" data-adjustment="brightness">
+                </div>
+                <div class="slider-group">
+                    <label>Temperature</label>
+                    <input type="range" min="-100" max="100" value="${this.adjustments.combined.temperature}" 
+                           data-layer="combined" data-adjustment="temperature">
+                </div>
+            `;
+            container.appendChild(combinedDiv);
+
+            this.setupSliderListeners(combinedDiv);
+        } else {
+            // Create individual layer controls
+            const layerCanvases = document.querySelectorAll('[id^="layer_canvas_"]');
+            
+            layerCanvases.forEach(layerCanvas => {
+                const layer = layerCanvas.id.split('_')[2];
+                
+                // Initialize layer adjustments if they don't exist
+                if (!this.adjustments[layer]) {
+                    this.adjustments[layer] = {
+                        hue: 0,
+                        saturation: 0,
+                        brightness: 0,
+                        temperature: 0
+                    };
+                }
+
+                const layerDiv = document.createElement('div');
+                layerDiv.className = 'layer-adjustments';
+                layerDiv.innerHTML = `
+                    <h4>Layer ${layer}</h4>
+                    <div class="slider-group">
+                        <label>Hue</label>
+                        <input type="range" min="-180" max="180" value="${this.adjustments[layer].hue}" 
+                               data-layer="${layer}" data-adjustment="hue">
+                    </div>
+                    <div class="slider-group">
+                        <label>Saturation</label>
+                        <input type="range" min="-100" max="100" value="${this.adjustments[layer].saturation}" 
+                               data-layer="${layer}" data-adjustment="saturation">
+                    </div>
+                    <div class="slider-group">
+                        <label>Brightness</label>
+                        <input type="range" min="-100" max="100" value="${this.adjustments[layer].brightness}" 
+                               data-layer="${layer}" data-adjustment="brightness">
+                    </div>
+                    <div class="slider-group">
+                        <label>Temperature</label>
+                        <input type="range" min="-100" max="100" value="${this.adjustments[layer].temperature}" 
+                               data-layer="${layer}" data-adjustment="temperature">
+                    </div>
+                `;
+
+                container.appendChild(layerDiv);
+                this.setupSliderListeners(layerDiv);
+            });
+        }
+    }
+
+    setupSliderListeners(containerDiv) {
+        containerDiv.querySelectorAll('input[type="range"]').forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                const layer = e.target.dataset.layer;
+                const adjustment = e.target.dataset.adjustment;
+                
+                // Initialize layer adjustments if they don't exist
+                if (!this.adjustments[layer]) {
+                    this.adjustments[layer] = {
+                        hue: 0,
+                        saturation: 0,
+                        brightness: 0,
+                        temperature: 0
+                    };
+                }
+
+                this.adjustments[layer][adjustment] = parseInt(e.target.value);
+                
+                if (layer === 'combined') {
+                    // Apply to all layers
+                    const layerCanvases = document.querySelectorAll('[id^="layer_canvas_"]');
+                    layerCanvases.forEach(canvas => {
+                        const layerNum = canvas.id.split('_')[2];
+                        // Initialize layer adjustments if they don't exist
+                        if (!this.adjustments[layerNum]) {
+                            this.adjustments[layerNum] = {
+                                hue: 0,
+                                saturation: 0,
+                                brightness: 0,
+                                temperature: 0
+                            };
+                        }
+                        this.adjustments[layerNum][adjustment] = parseInt(e.target.value);
+                        this.applyAdjustments(layerNum);
+                    });
+                } else {
+                    this.applyAdjustments(layer);
+                }
+            });
+        });
+    }
+
+    applyAdjustments(layer) {
+    const layerCanvas = document.getElementById(`layer_canvas_${layer}`);
+    if (!layerCanvas) return;
+
+    if (!this.adjustments[layer]) {
+        this.adjustments[layer] = {
+            hue: 0,
+            saturation: 0,
+            brightness: 0,
+            temperature: 0
+        };
+    }
+
+    const ctx = layerCanvas.getContext('2d');
+    const imageData = ctx.getImageData(0, 0, layerCanvas.width, layerCanvas.height);
+    const data = imageData.data;
+
+    // Store original image data if not already stored for this layer
+    if (!this.originalImageData[layer]) {
+        this.originalImageData[layer] = new Uint8ClampedArray(data);
+    }
+
+    for (let i = 0; i < data.length; i += 4) {
+        // Start from original values for this layer
+        let r = this.originalImageData[layer][i];
+        let g = this.originalImageData[layer][i + 1];
+        let b = this.originalImageData[layer][i + 2];
+
+            // Apply temperature adjustment
+            const temp = this.adjustments[layer].temperature;
+            if (temp !== 0) {
+                const adjustment = temp / 100;
+                if (adjustment > 0) {
+                    // Warming: increase red, decrease blue
+                    r = Math.min(255, r + (adjustment * 30));
+                    b = Math.max(0, b - (adjustment * 30));
+                } else {
+                    // Cooling: decrease red, increase blue
+                    r = Math.max(0, r - (Math.abs(adjustment) * 30));
+                    b = Math.min(255, b + (Math.abs(adjustment) * 30));
+                }
+            }
+
+            // Convert to HSL for other adjustments
+            let [h, s, l] = this.rgbToHsl(r, g, b);
+
+            // Apply other adjustments
+            h = (h + this.adjustments[layer].hue) % 360;
+            if (h < 0) h += 360;
+            s = Math.max(0, Math.min(100, s + this.adjustments[layer].saturation));
+            l = Math.max(0, Math.min(100, l + this.adjustments[layer].brightness));
+
+            // Convert back to RGB
+            [r, g, b] = this.hslToRgb(h, s, l);
+
+            // Set final values
+            data[i] = Math.round(Math.max(0, Math.min(255, r)));
+            data[i + 1] = Math.round(Math.max(0, Math.min(255, g)));
+            data[i + 2] = Math.round(Math.max(0, Math.min(255, b)));
+            // Alpha channel remains unchanged
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+    }
+
+
+    rgbToHsl(r, g, b) {
+        r /= 255;
+        g /= 255;
+        b /= 255;
+
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+
+        if (max === min) {
+            h = s = 0;
+        } else {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+
+        return [h * 360, s * 100, l * 100];
+    }
+
+    hslToRgb(h, s, l) {
+        h /= 360;
+        s /= 100;
+        l /= 100;
+
+        let r, g, b;
+
+        if (s === 0) {
+            r = g = b = l;
+        } else {
+            const hue2rgb = (p, q, t) => {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1/6) return p + (q - p) * 6 * t;
+                if (t < 1/2) return q;
+                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+            };
+
+            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            const p = 2 * l - q;
+
+            r = hue2rgb(p, q, h + 1/3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1/3);
+        }
+
+        return [r * 255, g * 255, b * 255];
+    }
+}
+
+// Initialize the adjuster
+const imageAdjuster = new ImageAdjuster();
+
+
+      function showLayerInfoButton(layerIndex){
+
+         $('#colorPickerModal').modal('show');
+         updateLayersWithNewColorCount(layerIndex+1);
+      }
+      function showLayerInfo() {
+         contextMenu.style.display = 'none';
+         $('#colorPickerModal').modal('show');
+         const layerIndex = contextMenu.dataset.layerIndex; // Assuming contextMenu is defined
+
+         updateLayersWithNewColorCount(layerIndex);
+       }
+      document.addEventListener('DOMContentLoaded', function() {
+        const layerColors = {};
+        const loadingScreen = document.getElementById('loading-screen');
+        const totalLayers = {{ layers|length }};
+        let loadedImagesCount = 0;
+        const loader = document.getElementById('loading-screen');
+        function showContextMenu(event, layerIndex, layerName) {
+
+          event.preventDefault();
+
+          // Set the layer name in the context menu
+          layerNameDisplay.innerText = layerName;
+
+          // Get the clicked thumbnail’s coordinates
+          const thumbnail = event.target.getBoundingClientRect();
+          const toolbarWidth = document.querySelector('.toolbar').offsetWidth;
+
+          // Position the context menu aligned to the toolbar, on the left side of the thumbnail
+          contextMenu.style.left = `${thumbnail.left - toolbarWidth - 20}px`; // Adjust as needed
+          contextMenu.style.top = `${thumbnail.top + window.scrollY}px`;
+          contextMenu.style.display = 'block';
+          contextMenu.dataset.layerIndex = layerIndex;
+
+          // Temporarily disable pointer events to avoid immediate hiding
+          setTimeout(() => {
+            contextMenu.style.pointerEvents = 'auto';
+          }, 0);
+        }
+
+        // Hide the context menu on clicking outside
+        document.addEventListener('click', function(event) {
+          if (contextMenu.style.display === 'block' && !contextMenu.contains(event.target) && !event.target.classList.contains('thumbnail')) {
+            contextMenu.style.display = 'none';
+          }
+        });
+        function checkIfAllImagesLoaded() {
+            if (loadedImagesCount === totalLayers) {
+                loadingScreen.style.display = 'none';
+                createColorButtons();
+            }
+        }
+
+      
+        function isColorInArray(color, array) {
+          return array.some(existingColor =>
+              existingColor[0] === color[0] &&
+              existingColor[1] === color[1] &&
+              existingColor[2] === color[2]
+          );
+        }
+        let distinctColorsArray = [];
+        let singleLayerDistinctColorsArray = [];
+        let distinctColorsArrayColorPallet = [];
+
+        {% for layer in layers %}
+        let img{{ forloop.counter }} = new Image();
+        img{{ forloop.counter }}.src = "{{ layer.path }}";
+        let canvas{{ forloop.counter }} = document.getElementById('layer_canvas_{{ forloop.counter }}');
+        let ctx{{ forloop.counter }} = canvas{{ forloop.counter }}.getContext('2d', { willReadFrequently: true });
+        let latestImageData{{ forloop.counter }} = null;
+        img{{ forloop.counter }}.onload = function() {
+          canvas{{ forloop.counter }}.width = img{{ forloop.counter }}.width;
+          canvas{{ forloop.counter }}.height = img{{ forloop.counter }}.height;
+          ctx{{ forloop.counter }}.drawImage(img{{ forloop.counter }}, 0, 0);
+            layerStates.saveOriginalState({{ forloop.counter }});
+            {% comment %} latestImageData{{ forloop.counter }} = ctx{{ forloop.counter }}.getImageData(0, 0, canvas{{ forloop.counter }}.width, canvas{{ forloop.counter }}.height); {% endcomment %}
+            const imageData{{ forloop.counter }} = ctx{{ forloop.counter }}.getImageData(0, 0, canvas{{ forloop.counter }}.width, canvas{{ forloop.counter }}.height);
+
+            // Add distinct colors to the set (ensures no duplicates)
+            let colorCount =0;
+            let distinctColorTolarance =0;
+
+            if(totalLayers>5){
+              distinctColorTolarance = 180;
+              colorCount=7;
+
+            }else{
+              distinctColorTolarance = 190;
+              colorCount=7;
+            }
+            const analysis = analyzeImageLayer(ctx{{ forloop.counter }});
+            let { avgLightness, hueTolerance, lightnessTolerance } = analysis;
+            hueTolerance = hueTolerance*100;
+            if(lightnessTolerance<0.5)lightnessTolerance=0.7
+            let distinctColors{{ forloop.counter }} = getDistinctColors(imageData{{ forloop.counter }},distinctColorTolarance, colorCount);
+
+            //console.info(distinctColors{{forloop.counter}});
+
+            distinctColors{{ forloop.counter }}.forEach((color, index) => {
+
+              if (!isColorInArray(color, distinctColorsArray)) {
+                if(index == 0){
+                  distinctColorsArrayColorPallet.push(color);
+                }
+
+                distinctColorsArray.push(color);
+              }
+            });
+
+
+
+            // Create a thumbnail
+            const thumbnailCanvas = document.createElement('canvas');
+            const thumbnailSize = 30;
+            thumbnailCanvas.width = thumbnailSize;
+            thumbnailCanvas.height = thumbnailSize;
+            const thumbnailCtx = thumbnailCanvas.getContext('2d');
+            thumbnailCtx.drawImage(img{{ forloop.counter }}, 0, 0, thumbnailSize, thumbnailSize);
+            document.getElementById('thumbnail_{{ forloop.counter }}').src = thumbnailCanvas.toDataURL();
+
+            // Increment the loaded image counter and check if all images are loaded
+            loadedImagesCount++;
+            checkIfAllImagesLoaded();
+          };
+          img{{ forloop.counter }}.onerror = function() {
+              //console.error(`Failed to load image {{ forloop.counter }}`);
+              loadedImagesCount++;
+              checkIfAllImagesLoaded();
+          };
+
+
+
+          let layerName{{ forloop.counter }} = "{{ layer.name }}"; // Store the layer name
+          let thumbnail{{ forloop.counter }} = document.getElementById('thumbnail_{{ forloop.counter }}');
+          let layerNameElement{{ forloop.counter }} = document.querySelector(`#toggleLayer{{ forloop.counter }}`).nextElementSibling;
+          if (thumbnail{{ forloop.counter }}) {
+            thumbnail{{ forloop.counter }}.addEventListener('click', function(event) {
+              showContextMenu(event, {{ forloop.counter }}, layerName{{ forloop.counter }});
+            });
+          }
+
+          if (layerNameElement{{ forloop.counter }}) {
+            layerNameElement{{ forloop.counter }}.addEventListener('click', function(event) {
+              showContextMenu(event, {{ forloop.counter }}, layerName{{ forloop.counter }});
+            });
+          }
+          loader.style.display = 'block';
+
+          setTimeout(() => {
+            const buttons = document.querySelectorAll('#image-color-pickers button');
+            const rgbColors = generateUniqueRGBColorArray(distinctColorsArrayColorPallet.length+1);
+            layerColors[{{ forloop.counter }}] = {
+              targetColors: distinctColorsArrayColorPallet,
+              newColors: rgbColors
+            };
+            displayColorPalette({{ forloop.counter }}, rgbColors, distinctColorsArrayColorPallet.length+1);
+
+
+            const layerIndex = {{ forloop.counter }};
+            const layerCanvas = document.getElementById(`layer_canvas_${layerIndex}`);
+
+            const applyButton = document.getElementById(`applyButton_${layerIndex}`);
+            const layerCtx = layerCanvas.getContext('2d', { willReadFrequently: true });
+            //console.log(layerCtx);
+
+     
+
+
+            if (applyButton) {
+              applyButton.addEventListener('click', async function (event) {
+                  // Load the original image first
+                  const img = new Image();
+                  img.src = "{{ layer.path }}";  // This will be replaced with actual path in the Django template
+                  
+                  await new Promise((resolve) => {
+                      img.onload = resolve;
+                  });
+          
+                  // Reset canvas to original image
+                  const canvas = document.getElementById(`layer_canvas_${layerIndex}`);
+                  const ctx = canvas.getContext('2d');
+                  ctx.clearRect(0, 0, canvas.width, canvas.height);
+                  ctx.drawImage(img, 0, 0);
+          
+                  const currentLayerPalette = document.getElementById(`colorPalette_${layerIndex}`);
+                  if (!currentLayerPalette) {
+                      console.error('Palette not found');
+                      return;
+                  }
+          
+                  const trendingPaletteColors = Array.from(currentLayerPalette.querySelectorAll('.color-swatch'))
+                      .map(swatch => {
+                          const style = window.getComputedStyle(swatch);
+                          const color = style.backgroundColor;
+                          return color.match(/\d+/g).map(Number);
+                      });
+          
+                  // Process the palette with the original image
+                  await processPallet(
+                      ctx, 
+                      totalLayers, 
+                      canvas, 
+                      layerIndex, 
+                      [], 
+                      trendingPaletteColors
+                  );
+              });
+          }
+            }, 1000); // 1-second delay
+          {% endfor %}
+      });
+  
+
+      function getDominantColor(imageData) {
+    const data = imageData.data;
+    const colorCounts = {};
+    const allColors = new Map();
+    let totalPixels = 0;
+
+    for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
+
+        if (a === 0) continue;
+        if ((r === 0 && g === 0 && b === 0) || (r === 255 && g === 255 && b === 255)) continue;
+
+        const [h, s, l] = rgbToHsl(r, g, b);
+
+        if (s < 0.05) continue;
+
+        const colorName = getDominantColorName([r, g, b]);
+        const existingColor = allColors.get(colorName);
+
+        if (existingColor) {
+            existingColor.pixelCount++;
+        } else {
+            allColors.set(colorName, { rgb: [r, g, b], colorName, pixelCount: 1 });
+        }
+
+        totalPixels++;
+    }
+
+    let maxCount = 0;
+    let dominantColor = null;
+
+    for (const [colorName, colorInfo] of allColors.entries()) {
+        if (colorInfo.pixelCount > maxCount) {
+            maxCount = colorInfo.pixelCount;
+            dominantColor = colorInfo;
+        }
+    }
+
+    if (dominantColor) {
+        const nonDominantColors = [];
+        for (const [colorName, colorInfo] of allColors.entries()) {
+            if (colorName !== dominantColor.colorName) {
+                const pixelPercentage = (colorInfo.pixelCount / totalPixels) * 100;
+                nonDominantColors.push({ ...colorInfo, pixelPercentage });
+            }
+        }
+
+        return {
+            referenceColor: dominantColor.rgb,
+            dominantHue: rgbToHsl(...dominantColor.rgb)[0],
+            tolerance: {
+                hue: 45 / 360,
+                saturation: 0.4,
+                lightness: 0.45
+            },
+            isSingleShade: false,
+            nonDominantColors,
+            dominantColorName: dominantColor.colorName
+        };
+    }
+
+    return null;
+}
+
+// Add this shuffle function at the top level
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function shuffleSinglePalette(layerIndex) {
+  const paletteContainer = document.getElementById(`colorPalette_${layerIndex}`);
+  if (!paletteContainer) return;
+
+  // Toggle the state for this palette
+  window.paletteToggleState[layerIndex] = !window.paletteToggleState[layerIndex];
+
+  if (window.paletteToggleState[layerIndex]) {
+      // If toggled on, generate and apply new colors
+      const swatches = Array.from(paletteContainer.querySelectorAll('.color-swatch'));
+      if (swatches.length === 0) return;
+
+      const colors = swatches.map(swatch => {
+          const style = window.getComputedStyle(swatch);
+          const bgcolor = style.backgroundColor;
+          return bgcolor.match(/\d+/g).map(Number);
+      });
+
+      // Shuffle colors
+      const shuffledColors = shuffleArray([...colors]);
+
+      // Apply shuffled colors
+      swatches.forEach((swatch, index) => {
+          swatch.style.backgroundColor = `rgb(${shuffledColors[index].join(',')})`;
+      });
+
+      // Store the shuffled colors
+      window.trendingPaletteColors[layerIndex] = shuffledColors;
+  } else {
+      // If toggled off, revert to original colors
+      const originalColors = window.originalPaletteColors[layerIndex];
+      if (originalColors) {
+          displayColorPalette(layerIndex, originalColors);
+      }
+  }
+}
+// Add event listeners for all shuffle buttons
+document.addEventListener('DOMContentLoaded', function() {
+    const totalLayers = {{ layers|length }};
+    
+    for (let i = 1; i <= totalLayers; i++) {
+        const shuffleButton = document.getElementById(`shufflePalette_${i}`);
+        if (shuffleButton) {
+            shuffleButton.addEventListener('click', () => shuffleSinglePalette(i));
+        }
+    }
+});
+
+
+
+
+function handleShuffleColors() {
+  const imageColorPickerContainer = document.getElementById('image-color-pickers');
+  const colorButtons = Array.from(imageColorPickerContainer.getElementsByClassName('pcr-button'));
+  
+  if (colorButtons.length === 0) return;
+
+  // Filter out locked colors
+  const unlockededColors = colorButtons.filter(button => button.dataset.locked !== 'true');
+  
+  if (unlockededColors.length === 0) {
+      console.log('All colors are locked');
+      return;
+  }
+
+  // Save current states before shuffling
+  unlockededColors.forEach(button => {
+      const layerIndex = parseInt(button.dataset.layerIndex) + 1;
+      layerStates.saveEditedState(layerIndex);
+  });
+
+  // Rest of your existing shuffle code...
+  const processPromises = shuffledColors.map((newColorData, index) => {
+      const originalData = colorData[index];
+      const button = originalData.element;
+      const layerIndex = parseInt(originalData.layerIndex) + 1;
+      
+      button.style.backgroundColor = `rgb(${newColorData.color.join(',')})`;
+      
+      const canvas = document.getElementById(`layer_canvas_${layerIndex}`);
+      if (canvas) {
+          if (layerStates.hasEditedState(layerIndex)) {
+              return new Promise((resolve) => {
+                  const img = new Image();
+                  img.onload = async () => {
+                      const ctx = canvas.getContext('2d');
+                      ctx.clearRect(0, 0, canvas.width, canvas.height);
+                      ctx.drawImage(img, 0, 0);
+                      
+                      await processLayerAsync(ctx, originalColors.get(originalData.layerIndex), newColorData.color);
+                      resolve();
+                  };
+                  img.src = layerStates.getEditedState(layerIndex);
+              });
+          } else {
+              const ctx = canvas.getContext('2d', { willReadFrequently: true });
+              return processLayerAsync(ctx, originalColors.get(originalData.layerIndex), newColorData.color);
+          }
+      }
+      return Promise.resolve();
+  });
+    // Wait for all color processing to complete
+    Promise.all(processPromises).then(() => {
+        console.log('All layers processed');
+        // Update any necessary UI elements or state
+    }).catch(error => {
+        console.error('Error during color processing:', error);
+    });
+}
+
+// Add a utility function to check if colors are significantly different
+function areColorsDifferent(color1, color2, threshold = 5) {
+    return Math.abs(color1[0] - color2[0]) > threshold ||
+           Math.abs(color1[1] - color2[1]) > threshold ||
+           Math.abs(color1[2] - color2[2]) > threshold;
+}
+
+// Modify your createColorButtons function to add layer index to buttons
+function createColorButtons() {
+    const imageColorAnalyzer = new ImageColorAnalyzer();
+    const imageColorPickerContainer = document.getElementById('image-color-pickers');
+    imageColorPickerContainer.innerHTML = '';
+
+    const canvasElements = document.querySelectorAll('canvas[id^="layer_canvas_"]');
+
+    canvasElements.forEach((canvas, index) => {
+        const layerIndex = index + 1;
+        const img = new Image();
+
+        img.onload = () => {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = img.width;
+            tempCanvas.height = img.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(img, 0, 0);
+
+            imageColorAnalyzer.analyzeImageColors(img)
+                .then(colorAnalysis => {
+                    if (colorAnalysis) {
+                        const dominantColor = colorAnalysis.dominantColor;
+
+                        // Create wrapper div for button and lock
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'color-button-wrapper';
+                        
+                        // Create color button
+                        const button = document.createElement('button');
+                        button.className = 'pcr-button color-picker';
+                        button.style.backgroundColor = `rgb(${dominantColor.join(',')})`;
+                        button.dataset.layerIndex = index;
+                        button.dataset.locked = 'false';
+                        
+                        // Create lock overlay
+                        const lockOverlay = document.createElement('div');
+                        lockOverlay.className = 'lock-overlay';
+                        lockOverlay.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-unlock" viewBox="0 0 16 16">
+                                <path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2zM3 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H3z"/>
+                            </svg>`;
+
+                        // Add click handler for lock
+                        lockOverlay.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const isLocked = button.dataset.locked === 'true';
+                            button.dataset.locked = !isLocked;
+                            lockOverlay.innerHTML = !isLocked ? 
+                                `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock" viewBox="0 0 16 16">
+                                    <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
+                                </svg>` :
+                                `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-unlock" viewBox="0 0 16 16">
+                                    <path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2zM3 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H3z"/>
+                                </svg>`;
+                        });
+
+                        wrapper.appendChild(button);
+                        wrapper.appendChild(lockOverlay);
+                        imageColorPickerContainer.appendChild(wrapper);
+                        
+                        button.addEventListener('click', () => {
+                            showLayerInfoButton(index);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error(`Error analyzing colors for layer ${layerIndex}:`, error);
+                });
+        };
+
+        img.src = canvas.toDataURL('image/png');
+    });
+}
+// Add event listener for shuffle button
+document.querySelector('.btn-success2').addEventListener('click', handleShuffleColors);
+
+// Add this to your existing DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', function() {
+    const layerColors = {};
+    const totalLayers = {{ layers|length }};
+    let loadedImagesCount = 0;
+
+    function checkIfAllImagesLoaded() {
+        if (loadedImagesCount === totalLayers) {
+            const loadingScreen = document.getElementById('loading-screen');
+            loadingScreen.style.display = 'none';
+
+            // Generate unique RGB color palettes for the trending palettes
+            const trendingPalettes = generateUniqueRGBColorPalettes(totalLayers, totalLayers);
+
+            {% for layer in layers %}
+            setTimeout(() => {
+                const layerIndex = {{ forloop.counter }};
+                const layerCanvas = document.getElementById(`layer_canvas_${layerIndex}`);
+
+                if (layerCanvas) {
+                    const layerCtx = layerCanvas.getContext('2d', { willReadFrequently: true });
+
+                    // Display the trending palette colors for this layer
+                    const paletteIndex = layerIndex - 1;
+                    const paletteColors = trendingPalettes[paletteIndex];
+                    displayColorPalette(layerIndex, paletteColors);
+
+                    // Store the colors for this layer
+                    layerColors[layerIndex] = {
+                        targetColors: paletteColors,
+                        newColors: paletteColors
+                    };
+                }
+            }, 1000); // 1-second delay
+            {% endfor %}
+        }
+    }
+
+    {% for layer in layers %}
+    let img{{ forloop.counter }} = new Image();
+    img{{ forloop.counter }}.src = "{{ layer.path }}";
+    let canvas{{ forloop.counter }} = document.getElementById('layer_canvas_{{ forloop.counter }}');
+    let ctx{{ forloop.counter }} = canvas{{ forloop.counter }}.getContext('2d', { willReadFrequently: true });
+    img{{ forloop.counter }}.onload = function() {
+        canvas{{ forloop.counter }}.width = img{{ forloop.counter }}.width;
+        canvas{{ forloop.counter }}.height = img{{ forloop.counter }}.height;
+        ctx{{ forloop.counter }}.drawImage(img{{ forloop.counter }}, 0, 0);
+        loadedImagesCount++;
+        checkIfAllImagesLoaded();
+    };
+    img{{ forloop.counter }}.onerror = function() {
+        loadedImagesCount++;
+        checkIfAllImagesLoaded();
+    };
+    {% endfor %}
+});
+
+function generateUniqueRGBColorPalettes(count, totalLayers) {
+    const palettes = [];
+
+    for (let i = 0; i < count; i++) {
+        const colors = generateUniqueRGBColorArray(totalLayers);
+        palettes.push(colors);
+    }
+
+    return palettes;
+}
+
+    </script>
+  </body>
+</html>
