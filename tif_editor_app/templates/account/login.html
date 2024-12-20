@@ -34,16 +34,18 @@
 
             <!-- Hero Text -->
             <div class="mb-8 text-center">
-                <h1 class="text-5xl font-bold mb-1 flex items-center justify-center relative">
-                    <span>
+                <h1 class="text-5xl font-bold mb-1 flex flex-wrap justify-center items-center gap-3">
+                    <span class="relative inline-block">
                         Where
-                        <span class="text-primary">Creativity</span>
-                        Comes to Life!
+                        <img src="{% static "images/underline.png" %}" class="absolute -bottom-5 left-0 w-full h-5" alt="underline" />
                     </span>
+                    <span class="text-primary">Creativity</span>
+                    <span>Comes to Life!</span>
                 </h1>
-                <img src="{% static 'images/underline.png' %}" class="w-40 h-5 mt-[-8px] ml-32" alt="underline" />
-                <p class="text-gray-600 text-lg mt-2">
-                    We are a community, together helping thousands of people<br />
+            
+                <p class="text-gray-600 text-lg mt-6">
+                    We are a community, together helping thousands of people
+                    <span class="hidden sm:inline"><br /></span>
                     out there who are struggling with design choices
                 </p>
             </div>

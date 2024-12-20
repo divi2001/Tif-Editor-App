@@ -25,6 +25,61 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
     <style>
+      .harmony-container {
+          position: relative;
+          display: inline-block;
+      }
+      
+      .btn-success3 {
+          background-color: #28a745;
+          color: white;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 4px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+      }
+      
+      .harmony-menu {
+          position: absolute;
+          bottom: 100%;
+          left: 0;
+          background-color: white;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          width: 200px;
+          z-index: 1000;
+          margin-bottom: 5px;
+      }
+      
+      .menu-item {
+          padding: 10px 15px;
+          cursor: pointer;
+          transition: background-color 0.2s;
+      }
+      
+      .menu-item:hover {
+          background-color: #f8f9fa;
+      }
+      
+      .menu-item.active {
+          background-color: #e9ecef;
+      }
+      
+      .menu-item:first-child {
+          border-top-left-radius: 4px;
+          border-top-right-radius: 4px;
+      }
+      
+      .menu-item:last-child {
+          border-bottom-left-radius: 4px;
+          border-bottom-right-radius: 4px;
+      }
+      </style>
+    <style>
       body {
         height: 100vh;
         display: flex;
@@ -812,6 +867,55 @@
       .effect-item[data-effect="brightness"] img {
           filter: brightness(150%);
       }
+
+      /* Add this to your existing CSS */
+.right-sidebar-specific {
+  position: relative;
+  background: #fff;
+  margin-right: 10px;
+  margin-left: 10px;
+  border-radius: 20px;
+  width: 250px;
+  min-width: 250px; /* Add this to prevent collapse */
+  transition: all 0.3s ease;
+  display: flex !important;
+  flex-direction: column;
+  flex-shrink: 0; /* Add this to prevent shrinking */
+}
+
+.right-sidebar-specific .sidebar-content {
+  padding: 20px;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  display: block !important;
+}
+
+.right-sidebar-specific.collapsed {
+  width: 46px;
+  min-width: 46px;
+}
+
+.right-sidebar-specific.collapsed .sidebar-content {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Layer toggle specific styles */
+.right-sidebar-specific .layer-toggles {
+  margin-top: 20px;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  display: block !important;
+}
+
+.right-sidebar-specific .layer-toggle-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
       </style>
       
     
@@ -985,7 +1089,7 @@
           </div>
       </div>
       </div>
-      </div>
+
 
       <!-- Main Content -->
       <div id="mainContent" class="content">
@@ -1027,7 +1131,7 @@
       <!-- Right Sidebar -->
       <div
         id="rightSidebar"
-        class="sidebar d-flex flex-column toolbar scrollable-toolbar"
+        class="sidebar1 d-flex flex-column toolbar scrollable-toolbar"
         style="flex: 0 0 250px"
       >
         <button
@@ -1037,7 +1141,7 @@
         >
           <i class="bi bi-caret-right-fill ms-auto"></i>
         </button>
-        <div class="sidebar-content m-4">
+        <div class="sidebar-content1 m-4">
           <h4 class="ms-auto me-auto mb-3">Layers</h4>
 
           <div class="layer-toggles mt-4">
@@ -1169,6 +1273,36 @@
     </svg>
     Shuffle
 </button>
+
+<div class="harmony-container">
+  <button type="button" class="btn btn-success3" id="harmonyButton">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-up" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
+      </svg>
+      Generate
+  </button>
+  <div class="harmony-menu" id="harmonyMenu" style="display: none;">
+      <div class="menu-item" data-harmony="Monochromatic">Monochromatic</div>
+      <div class="menu-item" data-harmony="Analogous">Analogous</div>
+      <div class="menu-item" data-harmony="Complementary">Complementary</div>
+      <div class="menu-item" data-harmony="Split Complementary">Split Complementary</div>
+      <div class="menu-item" data-harmony="Triadic">Triadic</div>
+      <div class="menu-item" data-harmony="Tetradic">Tetradic</div>
+      <div class="menu-item" data-harmony="Square">Square</div>
+  </div>
+</div>
+
+<div class="harmony-menu" id="harmonyMenu" style="display: none;">
+  <div class="menu-item" data-harmony="Monochromatic">Monochromatic</div>
+  <div class="menu-item" data-harmony="Analogous">Analogous</div>
+  <div class="menu-item" data-harmony="Complementary">Complementary</div>
+  <div class="menu-item" data-harmony="Split Complementary">Split Complementary</div>
+  <div class="menu-item" data-harmony="Triadic">Triadic</div>
+  <div class="menu-item" data-harmony="Tetradic">Tetradic</div>
+  <div class="menu-item" data-harmony="Square">Square</div>
+</div>
+
+
 
   <div id="visualizer_buttons">
       <button type="button" class="btn btn-success1">
@@ -3359,7 +3493,359 @@ hsvToRgb(hsv) {
 }
 
 }
+async function processHarmony(layerCtx, totalLayers, layerCanvas, currentLayerIndex, harmonyType) {
+  const loadingScreen = document.getElementById('loading-screen');
+  loadingScreen.style.display = 'block';
+  const analyzer = new ImageColorAnalyzer();
+  const colorProcessor = new ColorProcessor();
 
+  try {
+      // First, analyze the dominant color of the first unlocked layer
+      let dominantColor = null;
+      let firstUnlockedLayer = null;
+
+      for (let layer = 1; layer <= totalLayers; layer++) {
+          const colorButton = document.querySelector(`.color-picker[data-layer-index="${layer-1}"]`);
+          if (!colorButton || colorButton.dataset.locked !== 'true') {
+              firstUnlockedLayer = layer;
+              const layerCanvas = document.getElementById(`layer_canvas_${layer}`);
+              if (layerCanvas) {
+                  const tempImage = new Image();
+                  tempImage.src = layerCanvas.toDataURL('image/png');
+                  await new Promise(resolve => tempImage.onload = resolve);
+                  const colorAnalysis = await analyzer.analyzeImageColors(tempImage);
+                  if (colorAnalysis && colorAnalysis.dominantColor) {
+                      dominantColor = colorAnalysis.dominantColor;
+                      break;
+                  }
+              }
+          }
+      }
+
+      if (!dominantColor) {
+          console.error('No dominant color found');
+          return;
+      }
+
+      // Generate harmony colors based on the dominant color
+      const harmonyColors = generateHarmonyColors(dominantColor, harmonyType);
+
+      // Process each layer with harmony colors
+      for (let layer = 1; layer <= totalLayers; layer++) {
+          const colorButton = document.querySelector(`.color-picker[data-layer-index="${layer-1}"]`);
+          if (colorButton && colorButton.dataset.locked === 'true') {
+              console.log(`Layer ${layer} is locked, skipping processing`);
+              continue;
+          }
+
+          const layerCanvas = document.getElementById(`layer_canvas_${layer}`);
+          if (!layerCanvas) continue;
+
+          const layerCtx = layerCanvas.getContext('2d');
+          if (!layerCtx) continue;
+
+          // Load and analyze the layer
+          const originalImg = new Image();
+          const originalSrc = layerCanvas.getAttribute('data-original-src');
+          if (!originalSrc) continue;
+
+          await new Promise((resolve) => {
+              originalImg.onload = () => {
+                  layerCtx.clearRect(0, 0, layerCanvas.width, layerCanvas.height);
+                  layerCtx.drawImage(originalImg, 0, 0);
+                  resolve();
+              };
+              originalImg.src = originalSrc;
+          });
+
+          const tempImage = new Image();
+          tempImage.src = layerCanvas.toDataURL('image/png');
+          await new Promise(resolve => tempImage.onload = resolve);
+
+          const colorAnalysis = await analyzer.analyzeImageColors(tempImage);
+          if (!colorAnalysis) continue;
+
+          // Determine which harmony color to use based on layer position
+          const harmonyIndex = (layer - firstUnlockedLayer) % harmonyColors.length;
+          const targetColor = harmonyColors[harmonyIndex];
+
+          // Apply the harmony color
+          const base64Data = layerCanvas.toDataURL('image/png');
+          const colorMapping = await colorProcessor.getColorMapping(base64Data);
+          const modifiedImage = await colorProcessor.applyColorMapping(
+              base64Data,
+              colorMapping,
+              targetColor,
+              colorAnalysis.dominantColor
+          );
+
+          // Update the canvas with the new color
+          const img = new Image();
+          await new Promise((resolve) => {
+              img.onload = () => {
+                  layerCtx.clearRect(0, 0, layerCanvas.width, layerCanvas.height);
+                  layerCtx.drawImage(img, 0, 0);
+                  resolve();
+              };
+              img.src = modifiedImage;
+          });
+
+          updateFooterColorButton(layer, targetColor);
+      }
+  } catch (error) {
+      console.error("Error while processing harmony:", error);
+  } finally {
+      loadingScreen.style.display = 'none';
+  }
+}
+
+// Color Conversion Utilities
+function rgbToHsl(r, g, b) {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h, s, l = (max + min) / 2;
+
+  if (max === min) {
+      h = s = 0;
+  } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+      switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+  }
+
+  return [h, s, l];
+}
+
+function hslToRgb(h, s, l) {
+  let r, g, b;
+
+  if (s === 0) {
+      r = g = b = l;
+  } else {
+      const hue2rgb = (p, q, t) => {
+          if (t < 0) t += 1;
+          if (t > 1) t -= 1;
+          if (t < 1/6) return p + (q - p) * 6 * t;
+          if (t < 1/2) return q;
+          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+          return p;
+      };
+
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+
+      r = hue2rgb(p, q, h + 1/3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1/3);
+  }
+
+  return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+}
+
+// Updated Harmony Generation Functions with variations
+function generateMonochromatic(hsl) {
+  const [h, s, l] = hsl;
+  const variation = Math.random() * 0.2; // Random variation
+
+  return [
+      [h, s, l],
+      [h, s, Math.min(l + 0.2 + variation, 0.9)],
+      [h, s, Math.max(l - 0.2 - variation, 0.1)],
+      [h, Math.min(s + 0.15 + variation, 1), l],
+      [h, Math.max(s - 0.15 - variation, 0), l]
+  ];
+}
+
+function generateAnalogous(hsl) {
+  const [h, s, l] = hsl;
+  const variation = Math.random() * 0.05; // Random angle variation
+
+  return [
+      [h, s, l],
+      [(h + (1/12 + variation)) % 1, s, l],
+      [(h - (1/12 + variation) + 1) % 1, s, Math.min(l + 0.1, 0.9)],
+      [(h + (1/6 + variation)) % 1, s, Math.max(l - 0.1, 0.1)],
+      [(h - (1/6 + variation) + 1) % 1, Math.min(s + 0.1, 1), l]
+  ];
+}
+
+function generateComplementary(hsl) {
+  const [h, s, l] = hsl;
+  const variation = Math.random() * 0.1; // Random variation
+
+  return [
+      [h, s, l],
+      [(h + 0.5) % 1, s + variation, l],
+      [h, Math.min(s + 0.2 + variation, 1), l],
+      [h, s, Math.min(l + 0.15 + variation, 0.9)],
+      [(h + 0.5) % 1, Math.min(s + 0.15 + variation, 1), Math.min(l + 0.15, 0.9)]
+  ];
+}
+
+function generateSplitComplementary(hsl) {
+  const [h, s, l] = hsl;
+  const variation = Math.random() * 0.05; // Random angle variation
+
+  return [
+      [h, s, l],
+      [(h + 0.5 + (1/12 + variation)) % 1, s, Math.min(l + 0.1, 0.9)],
+      [(h + 0.5 - (1/12 + variation) + 1) % 1, s, Math.max(l - 0.1, 0.1)],
+      [h, Math.min(s + 0.15 + variation, 1), l],
+      [(h + 0.5) % 1, Math.min(s + 0.1, 1), Math.min(l + 0.15, 0.9)]
+  ];
+}
+
+function generateTriadic(hsl) {
+  const [h, s, l] = hsl;
+  const variation = Math.random() * 0.05; // Random variation
+
+  return [
+      [h, s, l],
+      [(h + (1/3 + variation)) % 1, Math.min(s + 0.1, 1), l],
+      [(h + (2/3 - variation)) % 1, s, Math.min(l + 0.1, 0.9)],
+      [(h + (1/3 + variation)) % 1, Math.max(s - 0.1, 0), Math.max(l - 0.1, 0.1)],
+      [(h + (2/3 - variation)) % 1, Math.min(s + 0.15, 1), l]
+  ];
+}
+
+function generateTetradic(hsl) {
+  const [h, s, l] = hsl;
+  const variation = Math.random() * 0.05; // Random variation
+
+  return [
+      [h, s, l],
+      [(h + (0.25 + variation)) % 1, Math.min(s + 0.1, 1), l],
+      [(h + (0.5 - variation)) % 1, s, Math.min(l + 0.1, 0.9)],
+      [(h + (0.75 + variation)) % 1, Math.max(s - 0.1, 0), Math.max(l - 0.1, 0.1)],
+      [h, Math.min(s + 0.15, 1), Math.min(l + 0.15, 0.9)]
+  ];
+}
+
+function generateSquare(hsl) {
+  const [h, s, l] = hsl;
+  const variation = Math.random() * 0.05; // Random variation
+
+  return [
+      [h, s, l],
+      [(h + (0.25 + variation)) % 1, Math.min(s + 0.1, 1), Math.min(l + 0.1, 0.9)],
+      [(h + (0.5 - variation)) % 1, Math.max(s - 0.1, 0), l],
+      [(h + (0.75 + variation)) % 1, s, Math.max(l - 0.1, 0.1)],
+      [h, Math.min(s + 0.2, 1), Math.min(l + 0.15, 0.9)]
+  ];
+}
+
+// Helper function to add subtle variations to colors
+function addVariation(value, amount, min = 0, max = 1) {
+  const variation = (Math.random() - 0.5) * 2 * amount;
+  return Math.max(min, Math.min(max, value + variation));
+}
+
+// Additional function to ensure colors are visually distinct
+function ensureDistinctColors(colors) {
+  return colors.map((color, index) => {
+      if (index === 0) return color; // Keep the base color unchanged
+      
+      const [h, s, l] = color;
+      return [
+          addVariation(h, 0.05),
+          addVariation(s, 0.1, 0.2, 1),
+          addVariation(l, 0.1, 0.2, 0.8)
+      ];
+  });
+}
+
+// Modify the generateHarmonyColors function to use ensureDistinctColors
+function generateHarmonyColors(baseColor, harmonyType) {
+  const hsl = rgbToHsl(baseColor[0], baseColor[1], baseColor[2]);
+  let colors = [];
+
+  switch (harmonyType) {
+      case 'Monochromatic':
+          colors = generateMonochromatic(hsl);
+          break;
+      case 'Analogous':
+          colors = generateAnalogous(hsl);
+          break;
+      case 'Complementary':
+          colors = generateComplementary(hsl);
+          break;
+      case 'Split Complementary':
+          colors = generateSplitComplementary(hsl);
+          break;
+      case 'Triadic':
+          colors = generateTriadic(hsl);
+          break;
+      case 'Tetradic':
+          colors = generateTetradic(hsl);
+          break;
+      case 'Square':
+          colors = generateSquare(hsl);
+          break;
+  }
+
+  // Ensure colors are distinct
+  colors = ensureDistinctColors(colors);
+  
+  // Convert back to RGB
+  return colors.map(hsl => hslToRgb(hsl[0], hsl[1], hsl[2]));
+}
+document.addEventListener('DOMContentLoaded', function() {
+  const harmonyButton = document.getElementById('harmonyButton');
+  const harmonyMenu = document.getElementById('harmonyMenu');
+  let selectedHarmony = '';
+
+  // Toggle menu on button click
+  harmonyButton.addEventListener('click', function(e) {
+      e.stopPropagation();
+      harmonyMenu.style.display = harmonyMenu.style.display === 'none' ? 'block' : 'none';
+  });
+
+  // Handle menu item selection
+  document.querySelectorAll('.menu-item').forEach(item => {
+      item.addEventListener('click', function(e) {
+          e.stopPropagation();
+          selectedHarmony = this.dataset.harmony;
+          
+          // Remove active class from all items
+          document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+          // Add active class to selected item
+          this.classList.add('active');
+          
+          // Close menu
+          harmonyMenu.style.display = 'none';
+          
+          // Process harmony
+          const totalLayers = document.querySelectorAll('[id^="layer_canvas_"]').length;
+          const firstCanvas = document.getElementById('layer_canvas_1');
+          if (firstCanvas) {
+              const ctx = firstCanvas.getContext('2d');
+              processHarmony(ctx, totalLayers, firstCanvas, 0, selectedHarmony);
+          }
+      });
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', function(e) {
+      if (!harmonyButton.contains(e.target) && !harmonyMenu.contains(e.target)) {
+          harmonyMenu.style.display = 'none';
+      }
+  });
+
+  // Prevent menu from closing when clicking inside it
+  harmonyMenu.addEventListener('click', function(e) {
+      e.stopPropagation();
+  });
+});
 class ImageAdjuster {
   constructor() {
         this.adjustments = {
@@ -3978,6 +4464,7 @@ function shuffleSinglePalette(layerIndex) {
       });
 
       // Store the shuffled colors
+      window.trendingPaletteColors = window.trendingPaletteColors || {};
       window.trendingPaletteColors[layerIndex] = shuffledColors;
   } else {
       // If toggled off, revert to original colors
@@ -4015,11 +4502,27 @@ function handleShuffleColors() {
       console.log('All colors are locked');
       return;
   }
-
+      // Store original colors and their corresponding layers
+      const colorData = unlockededColors.map(button => {
+        const style = window.getComputedStyle(button);
+        const bgcolor = style.backgroundColor;
+        const layerIndex = button.dataset.layerIndex;
+        const colorArray = bgcolor.match(/\d+/g).map(Number);
+        return {
+            color: colorArray,
+            layerIndex: layerIndex,
+            element: button
+        };
+    });
+  const shuffledColors = shuffleArray([...colorData]);
   // Save current states before shuffling
   unlockededColors.forEach(button => {
       const layerIndex = parseInt(button.dataset.layerIndex) + 1;
       layerStates.saveEditedState(layerIndex);
+  });
+  const originalColors = new Map();
+  colorData.forEach(data => {
+      originalColors.set(data.layerIndex, data.color);
   });
 
   // Rest of your existing shuffle code...
