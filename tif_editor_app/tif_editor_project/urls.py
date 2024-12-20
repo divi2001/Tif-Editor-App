@@ -37,4 +37,8 @@ urlpatterns = [
     # Include all other allauth URLs
     path('accounts/', include('allauth.urls')),
     path('', include('apps.api.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+if settings.DEBUG:
+    # Serve media files in development
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

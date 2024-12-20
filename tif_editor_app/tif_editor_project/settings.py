@@ -210,7 +210,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Media
-MEDIA_URL = '/media/'
+MEDIA_URL = '/tif-editor/media/'  # This adds a leading slash
 MEDIA_ROOT = BASE_DIR / 'media'
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 10000  # 10 MB
 STRIPE_PUBLIC_KEY = 'your_public_key_here'
