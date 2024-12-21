@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-r2)wh3bat$8gl#wr+6h3h_0kiov)zo%l-0#4nxj!z2dw&jdwfg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -101,7 +101,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'tif_editor_db',
         'USER': 'root',
-        'PASSWORD': 'tanuj1221',
+        'PASSWORD': 'root1221',
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
