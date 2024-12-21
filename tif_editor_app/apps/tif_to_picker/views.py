@@ -19,14 +19,13 @@ from django.views.decorators.csrf import csrf_exempt
 from PIL import Image
 import io
 from PIL import Image
-from sklearn.cluster import KMeans
+
 import colorsys
 from typing import Dict, List, Optional
-import webcolors
+
 from colorsys import rgb_to_hls
 import base64
-import zlib
-import piexif
+
 import imagecodecs
 from PIL import ImageOps
 import cv2
