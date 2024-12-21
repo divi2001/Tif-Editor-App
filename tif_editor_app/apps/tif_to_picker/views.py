@@ -32,7 +32,7 @@ import cv2
 import logging
 from .getcolors import analyze_image_colors
 from io import BytesIO
-from .colormap import apply_color_mapping_django,get_color_mapping_django
+
 logger = logging.getLogger(__name__)
 
 from django.shortcuts import render
@@ -51,28 +51,7 @@ def inspiration_view(request):
     
     return JsonResponse({'pdfs': pdfs_data})
 
-@csrf_exempt
-def apply_color(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        image_data = data.get('imageData')
-        target_color = data.get('targetColor')
-        
-        # First get the color mapping
-        color_mapping = get_color_mapping_django(image_data)
-        
-        # Then apply the color mapping
-        modified_image = apply_color_mapping_django(
-            image_data,
-            color_mapping,
-            target_color
-        )
-        
-        return JsonResponse({
-            'success': True,
-            'modifiedImage': modified_image,
-            'colorMapping': color_mapping
-        })
+
 
 @csrf_exempt
 def analyze_color(request):
