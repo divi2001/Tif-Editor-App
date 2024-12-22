@@ -52,7 +52,7 @@ Thumbs.db
 *.secret
 
 # Media files
-media/
+
 
 # Static files
 staticfiles/
