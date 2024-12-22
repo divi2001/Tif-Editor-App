@@ -202,6 +202,7 @@ def process_svg_upload(request):
         'width': width,
         'height': height
     })
+
 def upload_tiff(request):
     if request.method == 'POST':
         form = TiffUploadForm(request.POST, request.FILES)
@@ -299,95 +300,25 @@ def export_tiff(request):
     # Return an error response if the request method is not POST
     return HttpResponse('Invalid request method', status=405)
 
-def advanced_compress_png(image_array, output_path, quality_threshold=0.95):
-    """
-    Advanced compression using multiple techniques and selecting the best result
-    """
+def get_layer_image(layer):
     try:
-        # Convert numpy array to PIL Image
-        if image_array.ndim == 2:
-            img = Image.fromarray(np.uint8(image_array * 255), 'L')
+        channels_data = []
+        for channel in layer.channels:
+            if channel.channelid in [PsdChannelId.CHANNEL0, PsdChannelId.CHANNEL1, PsdChannelId.CHANNEL2]:
+                if channel.data.ndim == 2:
+                    channels_data.append(channel.data)
+                else:
+                    print(
+                        f"Unexpected channel data shape: {channel.data.shape}")
+
+        if len(channels_data) == 3:
+            image_data = np.stack(channels_data, axis=-1)
+            return image_data
         else:
-            img = Image.fromarray(np.uint8(image_array * 255), 'RGB')
-
-        # Original size
-        temp_buffer = BytesIO()
-        img.save(temp_buffer, format='PNG')
-        original_size = temp_buffer.tell()
-        best_size = original_size
-        best_method = None
-        best_data = None
-
-        # Method 1: PIL's built-in optimization
-        temp_buffer = BytesIO()
-        img.save(temp_buffer, 
-                format='PNG',
-                optimize=True,
-                compress_level=9)
-        size1 = temp_buffer.tell()
-        if size1 < best_size:
-            best_size = size1
-            best_method = "PIL"
-            best_data = temp_buffer.getvalue()
-
-        # Method 2: Remove metadata and convert to optimized palette
-        img_no_meta = ImageOps.exif_transpose(img)
-        if img_no_meta.mode in ['RGB', 'RGBA']:
-            try:
-                img_no_meta = img_no_meta.quantize(colors=256, method=2)
-            except Exception as e:
-                print(f"Quantization failed: {e}")
-
-        temp_buffer = BytesIO()
-        img_no_meta.save(temp_buffer,
-                        format='PNG',
-                        optimize=True,
-                        compress_level=9)
-        size2 = temp_buffer.tell()
-        if size2 < best_size:
-            best_size = size2
-            best_method = "Palette"
-            best_data = temp_buffer.getvalue()
-
-        # Method 3: OpenCV compression
-        if image_array.ndim == 3:
-            # Convert to BGR for OpenCV
-            cv_img = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
-        else:
-            cv_img = image_array
-
-        encode_param = [cv2.IMWRITE_PNG_COMPRESSION, 9]
-        _, encoded = cv2.imencode('.png', cv_img, encode_param)
-        size3 = len(encoded)
-        if size3 < best_size:
-            best_size = size3
-            best_method = "OpenCV"
-            best_data = encoded.tobytes()
-
-        # Method 4: Using imagecodecs for additional compression
-        try:
-            compressed = imagecodecs.png_encode(image_array, level=9)
-            size4 = len(compressed)
-            if size4 < best_size:
-                best_size = size4
-                best_method = "imagecodecs"
-                best_data = compressed
-        except Exception as e:
-            print(f"imagecodecs compression failed: {e}")
-
-        # Save the best result
-        if best_data and best_size < original_size:
-            with open(output_path, 'wb') as f:
-                f.write(best_data)
-            compression_ratio = (original_size - best_size) / original_size * 100
-            print(f"Best compression achieved with {best_method}: {compression_ratio:.1f}% reduction")
-        else:
-            # If no better compression found, save with default optimization
-            img.save(output_path, format='PNG', optimize=True, compress_level=9)
-            
-        return best_size
+            print(f"Unexpected number of channels: {len(channels_data)}")
+            return None
     except Exception as e:
-        print(f"Error in advanced compression: {str(e)}")
+        print(f"Error retrieving layer image: {str(e)}")
         return None
 
 def extract_layers(file_path, output_dir):
@@ -395,100 +326,38 @@ def extract_layers(file_path, output_dir):
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    
     layers_info = []
-    
     if isd.layers:
+
         for layer in isd.layers:
-            try:
-                image = layer.asarray()
-                layer_position_from_top = layer.offset[0]
-                layer_position_from_left = layer.offset[1]
-                
-                if image.size > 0:
-                    # Check if image contains transparency
-                    has_transparency = (image.shape[-1] == 4) if len(image.shape) > 2 else False
-                    
-                    layer_output_path = os.path.join(output_dir, f"{layer.name}.png")
-                    
-                    if not os.path.exists(layer_output_path):
-                        original_size = image.nbytes
-                        
-                        # Pre-process image if possible
-                        if not has_transparency:
-                            # Reduce color depth if possible
-                            if image.ndim == 3:
-                                image = np.uint8(image * 255)
-                                # Convert to grayscale if RGB channels are similar
-                                r, g, b = image[:,:,0], image[:,:,1], image[:,:,2]
-                                if np.allclose(r, g, rtol=0.05) and np.allclose(g, b, rtol=0.05):
-                                    image = np.mean(image, axis=2).astype(np.uint8)
 
-                        compressed_size = advanced_compress_png(image, layer_output_path)
-                        
-                        if compressed_size:
-                            compression_ratio = (original_size - compressed_size) / original_size * 100
-                            print(f"Layer {layer.name}: Compressed from {original_size/1024:.2f}KB to {compressed_size/1024:.2f}KB ({compression_ratio:.1f}% reduction)")
-                    
-                    layer_width, layer_height = None, None
-                    for channel in layer.channels:
-                        channel_data = np.array(channel.data)
-                        if layer_width is None and layer_height is None:
-                            layer_height, layer_width = channel_data.shape
-                            layers_info.append({
-                                'name': layer.name,
-                                'path': layer_output_path,
-                                'layer_position_from_top': layer_position_from_top,
-                                'layer_position_from_left': layer_position_from_left,
-                            })
-                else:
-                    print(f'Layer {layer.name!r} image size is zero')
-                    
-            except Exception as e:
-                print(f"Error processing layer {layer.name}: {str(e)}")
-                continue
+            image = layer.asarray()
+            # image_pros = get_layer_image(layer)
+            # unique_colors = []
+            layer_position_from_top = layer.offset[0]
+            layer_position_from_left = layer.offset[1]
+            if image.size > 0:
+                layer_output_path = os.path.join(output_dir, f"{layer.name}.png")  # Save as PNG
+                if not os.path.exists(layer_output_path):
+                    pyplot.imsave(layer_output_path, image, cmap='gray' if image.ndim == 2 else None)
+                layer_width, layer_height = None, None
+                for channel in layer.channels:
+                    channel_data = np.array(channel.data)
+                    if layer_width is None and layer_height is None:
+                        layer_height, layer_width = channel_data.shape
+                        layers_info.append({
+                            'name': layer.name,
+                            'path': layer_output_path,
 
+                            'layer_position_from_top': layer_position_from_top,  # Add most common colors
+                            'layer_position_from_left': layer_position_from_left,  # Add most common colors
+                        })
+
+
+            else:
+                print(f'Layer {layer.name!r} image size is zero')
     return layers_info
 
-# Optional: Add a function to check file sizes
-def get_file_size_mb(file_path):
-    """Get file size in MB"""
-    return os.path.getsize(file_path) / (1024 * 1024)
-
-# Optional: Add batch compression for existing files
-def compress_existing_files(directory):
-    """Compress all existing PNG files in directory"""
-    for filename in os.path.listdir(directory):
-        if filename.endswith('.png'):
-            file_path = os.path.join(directory, filename)
-            original_size = get_file_size_mb(file_path)
-            
-            # Create temporary path for new compressed file
-            temp_path = os.path.join(directory, f"temp_{filename}")
-            
-            # Open and recompress
-            try:
-                with Image.open(file_path) as img:
-                    img.save(temp_path, 
-                           format='PNG',
-                           optimize=True,
-                           compress_level=9,
-                           include_color_table=False)
-                
-                new_size = get_file_size_mb(temp_path)
-                
-                # Replace original with compressed version if smaller
-                if new_size < original_size:
-                    os.replace(temp_path, file_path)
-                    print(f"Compressed {filename}: {original_size:.2f}MB → {new_size:.2f}MB")
-                else:
-                    os.remove(temp_path)
-                    print(f"Kept original {filename} (already optimized)")
-                    
-            except Exception as e:
-                print(f"Error compressing {filename}: {str(e)}")
-                if os.path.exists(temp_path):
-                    os.remove(temp_path)
 
 def extractColors():
     print("testing")
