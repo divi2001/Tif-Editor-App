@@ -27,14 +27,13 @@ urlpatterns = [
     path('tif-editor/', include('apps.tif_to_picker.urls')),
     path('mainadmin', include('apps.mainadmin.urls')),
 
-    # Override the default allauth password reset confirm URL before including allauth.urls
-    re_path(
-        r"^accounts/password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
-        PasswordResetFromKeyView.as_view(template_name="account/password_reset_confirm.html"),
-        name="account_reset_password_from_key",
-    ),
-    
-    # Include all other allauth URLs
+    # The main password reset URL
+    # re_path(
+    #     r"^accounts/password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
+    #     PasswordResetFromKeyView.as_view(template_name="account/password_reset_from_key.html"),
+    #     name="account_reset_password_from_key"
+    # ),
+    # The done view
     path('accounts/', include('allauth.urls')),
     path('', include('apps.api.urls')),
 ]
