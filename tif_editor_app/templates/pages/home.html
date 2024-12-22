@@ -34,9 +34,38 @@
                     <button class="px-8 py-3 bg-[#4052FF] text-white rounded-full hover:bg-[#3544d6] transition-colors">
                         Explore Palettes
                     </button>
+                  <!-- Button and Popup Trigger -->
+                  {% if user.is_authenticated %}
                     <a href="{% url 'upload_tiff' %}" class="px-8 py-3 bg-white text-[#4052FF] rounded-full border border-[#4052FF] hover:bg-gray-50 transition-colors">
                       Edit Tiff file
-                    </a>
+                    </a>                    
+                  {% else %}
+                    <button
+                      class="px-8 py-3 bg-white text-[#4052FF] rounded-full border border-[#4052FF] hover:bg-gray-50 transition-colors"
+                      onclick="toggleModal('loginModal')">
+                      Edit Tiff file
+                    </button>
+                  {% endif %}
+
+                  <!-- Popup Modal -->
+                  <div id="loginModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg shadow-lg p-6 w-96">
+                      <h2 class="text-lg font-semibold text-gray-800">Please Login</h2>
+                      <p class="mt-2 text-sm text-gray-600">
+                        You need to log in to edit Tiff files.
+                      </p>
+                      <div class="mt-4 flex justify-end">
+                        <a href="{% url 'account_login' %}" class="px-4 py-2 bg-[#4052FF] text-white rounded-lg hover:bg-[#4052FF]/90">
+                          Login
+                        </a>
+                        <button
+                          class="ml-2 px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400"
+                          onclick="toggleModal('loginModal')">
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
             </div>
 
@@ -475,6 +504,15 @@
         video.removeAttribute('controls');
     }
 
+    function toggleModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+    
     // Setup controls for both videos
     setupVideoControls('myVideo1', 'playPauseButton1', 'playIcon1', 'pauseIcon1');
     setupVideoControls('myVideo2', 'playPauseButton2', 'playIcon2', 'pauseIcon2');

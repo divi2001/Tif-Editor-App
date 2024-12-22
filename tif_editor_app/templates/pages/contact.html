@@ -64,27 +64,28 @@
                <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Consequatur omnis ducimus, molestiae dolorem alias doloremque rem sint porro asperiores accusantium, earum ea. Nam pariatur laboriosam quod asperiores necessitatibus at ea sunt, ab accusamus quaerat maiores repellendus alias ratione voluptates doloremque deleniti deserunt culpa minus! Totam iusto distinctio molestiae dicta laborum dolorem. Sint hic at qui. Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus eum rerum molestiae sequi, mollitia corrupti sint unde qui nihil expedita! Saepe neque ex est rerum velit iste dolores exercitationem sint eaque quo! Ducimus quaerat facere corporis exercitationem quia, possimus neque eum deserunt tempora debitis labore illum provident harum pariatur quibusdam rerum at fugiat? Corrupti, fuga. 
                </p><p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Laboriosam sed voluptates, perspiciatis accusamus, exercitationem sapiente ratione tempora magni architecto quisquam harum, quo quasi sint impedit quas fugit eos aut adipisci soluta. Non enim corrupti unde earum! Placeat maxime doloremque esse, fugiat nulla voluptatum neque illum perspiciatis, aspernatur quod totam fugit adipisci provident dolores tempore enim.</p>
               </div>
-            <div class="bg-white p-8 rounded-2xl shadow-lg">
-                <form class="space-y-6">
+              <div class="bg-white p-8 rounded-2xl shadow-lg">
+                <form class="space-y-6" method="post" action="{% url 'contact' %}">
+                    {% csrf_token %}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
-                            <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                            <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                            <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
-                            <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                            <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                            <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                         </div>
                     </div>
-    
+            
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                        <input type="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                        <input type="email" id="email" name="email" value="{{ user.email }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                     </div>
-    
+            
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Message *</label>
-                        <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                        <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject *</label>
+                        <select id="subject" name="subject" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                             <option value="">Select a subject</option>
                             <option value="general">General Inquiry</option>
                             <option value="support">Technical Support</option>
@@ -92,11 +93,12 @@
                             <option value="other">Other</option>
                         </select>
                     </div>
-    
+            
                     <div>
-                        <textarea rows="4" placeholder="Message..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required></textarea>
+                        <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message *</label>
+                        <textarea id="message" name="message" rows="4" placeholder="Message..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required></textarea>
                     </div>
-    
+            
                     <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300">
                         Submit Now
                     </button>

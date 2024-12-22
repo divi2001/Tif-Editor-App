@@ -14,6 +14,32 @@
         .mobile-menu.active {
             display: block;
         }
+        .custom-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
+            margin: 20px 0;
+        }
+
+        .custom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .custom-slider-dark {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-slider-dark::-webkit-slider-thumb {
+            background: #1664E8;
+        }
     </style>
 </head>
 
