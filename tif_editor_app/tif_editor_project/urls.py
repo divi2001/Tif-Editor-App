@@ -25,7 +25,7 @@ urlpatterns = [
     path('api/', include('apps.api.urls')),
     path('subscription/', include('apps.subscription_module.urls')),
     path('tif-editor/', include('apps.tif_to_picker.urls')),
-    path('mainadmin', include('apps.mainadmin.urls')),
+    # path('mainadmin', include('apps.mainadmin.urls')),
 
     # Override the default allauth password reset confirm URL before including allauth.urls
     re_path(

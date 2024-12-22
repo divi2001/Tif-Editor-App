@@ -1663,13 +1663,13 @@ function applyBrightness(ctx, width, height, factor) {
 
 {% comment %} for pdf {% endcomment %}
 // Function to download PDF
-function loadInspirationPDFs() {
+function loadInspirationContent() {
   const inspirationContent = document.getElementById('inspirationContent');
-  
+
   // Show loading state
   inspirationContent.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
 
-  fetch('/inspiration-pdfs/') // Update this URL to match your URL configuration
+  fetch('inspiration-pdfs/') // Update this URL to match your URL configuration
       .then(response => response.json())
       .then(data => {
           let htmlContent = `
@@ -1687,7 +1687,7 @@ function loadInspirationPDFs() {
                               <span class="pdf-name">${pdf.title}</span>
                               <div class="pdf-actions">
                                   <span class="pdf-likes">
-                                      <i class="bi bi-heart"></i> 
+                                      <i class="bi ${pdf.liked ? 'bi-heart-fill' : 'bi-heart'}" onclick="toggleLike(${pdf.id}, this)"></i> 
                                       <span class="likes-count">${pdf.likes_count}</span>
                                   </span>
                                   <button class="btn btn-sm btn-primary download-btn" 
@@ -1707,9 +1707,6 @@ function loadInspirationPDFs() {
           `;
 
           inspirationContent.innerHTML = htmlContent;
-
-          // Initialize event listeners for the newly added elements
-          initializePDFEvents();
       })
       .catch(error => {
           console.error('Error:', error);
@@ -1717,6 +1714,41 @@ function loadInspirationPDFs() {
       });
 }
 
+function toggleLike(pdfId, element) {
+  fetch('inspiration-pdfs/', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': getCookie('csrftoken'),
+      },
+      body: `pdf_id=${pdfId}`
+  })
+  .then(response => response.json())
+  .then(data => {
+      // Update the like button and count based on the response
+      element.className = data.liked ? 'bi bi-heart-fill' : 'bi bi-heart';
+      element.nextElementSibling.textContent = data.likes_count;
+  })
+  .catch(error => console.error('Error:', error));
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+          }
+      }
+  }
+  return cookieValue;
+}
+
+// Call this function when the page loads
+loadInspirationContent();
 function downloadPDF(pdfUrl, title) {
   fetch(pdfUrl)
       .then(response => response.blob())
@@ -1747,32 +1779,7 @@ function initializePDFEvents() {
   });
 }
 
-// Function to toggle like
-function toggleLike(pdfId, element) {
-  fetch(`/toggle-like/${pdfId}/`, {
-      method: 'POST',
-      headers: {
-          'X-CSRFToken': getCookie('csrftoken'),
-      }
-  })
-  .then(response => response.json())
-  .then(data => {
-      if (data.status === 'success') {
-          const likesCount = element.querySelector('.likes-count');
-          const heartIcon = element.querySelector('.bi');
-          
-          likesCount.textContent = data.likes_count;
-          if (data.liked) {
-              heartIcon.classList.remove('bi-heart');
-              heartIcon.classList.add('bi-heart-fill');
-          } else {
-              heartIcon.classList.remove('bi-heart-fill');
-              heartIcon.classList.add('bi-heart');
-          }
-      }
-  })
-  .catch(error => console.error('Error:', error));
-}
+
 
 // Call this function when inspiration button is clicked
 document.getElementById('inspirationButton').addEventListener('click', function(e) {

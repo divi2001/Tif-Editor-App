@@ -19,7 +19,7 @@ from django.views.decorators.csrf import csrf_exempt
 from PIL import Image
 import io
 from PIL import Image
-
+from django.views import View
 import colorsys
 from typing import Dict, List, Optional
 
@@ -34,23 +34,49 @@ from .getcolors import analyze_image_colors
 from io import BytesIO
 
 logger = logging.getLogger(__name__)
-
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from django.shortcuts import render
-from apps.mainadmin.models import InspirationPDF
+from apps.subscription_module.models import InspirationPDF,PDFLike
 
-def inspiration_view(request):
-    pdfs = InspirationPDF.objects.all().order_by('-created_at')
-    pdfs_data = [{
-        'id': pdf.id,
-        'title': pdf.title,
-        'preview_image': pdf.preview_image.url if pdf.preview_image else None,
-        'pdf_url': pdf.pdf_file.url if pdf.pdf_file else None,
-        'likes_count': pdf.likes_count,
-        'created_at': pdf.created_at.strftime('%Y-%m-%d')
-    } for pdf in pdfs]
-    
-    return JsonResponse({'pdfs': pdfs_data})
+class InspirationView(View):
+    def get(self, request):
+        pdfs = InspirationPDF.objects.all().order_by('-created_at')
+        pdfs_data = []
 
+        for pdf in pdfs:
+            liked = PDFLike.objects.filter(user=request.user, pdf=pdf).exists() if request.user.is_authenticated else False
+            pdfs_data.append({
+                'id': pdf.id,
+                'title': pdf.title,
+                'preview_image': pdf.preview_image.url if pdf.preview_image else None,
+                'pdf_url': pdf.pdf_file.url if pdf.pdf_file else None,
+                'likes_count': pdf.likes_count,
+                'created_at': pdf.created_at.strftime('%Y-%m-%d'),
+                'liked': liked
+            })
+        
+        return JsonResponse({'pdfs': pdfs_data})
+
+    @method_decorator(login_required)
+    def post(self, request):
+        pdf_id = request.POST.get('pdf_id')
+        pdf = InspirationPDF.objects.get(id=pdf_id)
+        like, created = PDFLike.objects.get_or_create(user=request.user, pdf=pdf)
+        
+        if not created:
+            # User has already liked this PDF, so unlike it
+            like.delete()
+            liked = False
+        else:
+            liked = True
+        
+        return JsonResponse({
+            'liked': liked,
+            'likes_count': pdf.likes_count
+        })
+
+inspiration_view = InspirationView.as_view()
 
 
 @csrf_exempt

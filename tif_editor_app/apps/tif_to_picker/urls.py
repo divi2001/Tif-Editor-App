@@ -13,3 +13,4 @@ urlpatterns = [
   
     path('inspiration-pdfs/', views.inspiration_view, name='inspiration_pdfs'),
 ]
+ 
