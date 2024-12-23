@@ -202,6 +202,7 @@ def process_svg_upload(request):
         'width': width,
         'height': height
     })
+
 def upload_tiff(request):
     if request.method == 'POST':
         form = TiffUploadForm(request.POST, request.FILES)
@@ -299,196 +300,204 @@ def export_tiff(request):
     # Return an error response if the request method is not POST
     return HttpResponse('Invalid request method', status=405)
 
-def advanced_compress_png(image_array, output_path, quality_threshold=0.95):
-    """
-    Advanced compression using multiple techniques and selecting the best result
-    """
+def get_layer_image(layer):
     try:
-        # Convert numpy array to PIL Image
-        if image_array.ndim == 2:
-            img = Image.fromarray(np.uint8(image_array * 255), 'L')
+        channels_data = []
+        for channel in layer.channels:
+            if channel.channelid in [PsdChannelId.CHANNEL0, PsdChannelId.CHANNEL1, PsdChannelId.CHANNEL2]:
+                if channel.data.ndim == 2:
+                    channels_data.append(channel.data)
+                else:
+                    print(
+                        f"Unexpected channel data shape: {channel.data.shape}")
+
+        if len(channels_data) == 3:
+            image_data = np.stack(channels_data, axis=-1)
+            return image_data
         else:
-            img = Image.fromarray(np.uint8(image_array * 255), 'RGB')
-
-        # Original size
-        temp_buffer = BytesIO()
-        img.save(temp_buffer, format='PNG')
-        original_size = temp_buffer.tell()
-        best_size = original_size
-        best_method = None
-        best_data = None
-
-        # Method 1: PIL's built-in optimization
-        temp_buffer = BytesIO()
-        img.save(temp_buffer, 
-                format='PNG',
-                optimize=True,
-                compress_level=9)
-        size1 = temp_buffer.tell()
-        if size1 < best_size:
-            best_size = size1
-            best_method = "PIL"
-            best_data = temp_buffer.getvalue()
-
-        # Method 2: Remove metadata and convert to optimized palette
-        img_no_meta = ImageOps.exif_transpose(img)
-        if img_no_meta.mode in ['RGB', 'RGBA']:
-            try:
-                img_no_meta = img_no_meta.quantize(colors=256, method=2)
-            except Exception as e:
-                print(f"Quantization failed: {e}")
-
-        temp_buffer = BytesIO()
-        img_no_meta.save(temp_buffer,
-                        format='PNG',
-                        optimize=True,
-                        compress_level=9)
-        size2 = temp_buffer.tell()
-        if size2 < best_size:
-            best_size = size2
-            best_method = "Palette"
-            best_data = temp_buffer.getvalue()
-
-        # Method 3: OpenCV compression
-        if image_array.ndim == 3:
-            # Convert to BGR for OpenCV
-            cv_img = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
-        else:
-            cv_img = image_array
-
-        encode_param = [cv2.IMWRITE_PNG_COMPRESSION, 9]
-        _, encoded = cv2.imencode('.png', cv_img, encode_param)
-        size3 = len(encoded)
-        if size3 < best_size:
-            best_size = size3
-            best_method = "OpenCV"
-            best_data = encoded.tobytes()
-
-        # Method 4: Using imagecodecs for additional compression
-        try:
-            compressed = imagecodecs.png_encode(image_array, level=9)
-            size4 = len(compressed)
-            if size4 < best_size:
-                best_size = size4
-                best_method = "imagecodecs"
-                best_data = compressed
-        except Exception as e:
-            print(f"imagecodecs compression failed: {e}")
-
-        # Save the best result
-        if best_data and best_size < original_size:
-            with open(output_path, 'wb') as f:
-                f.write(best_data)
-            compression_ratio = (original_size - best_size) / original_size * 100
-            print(f"Best compression achieved with {best_method}: {compression_ratio:.1f}% reduction")
-        else:
-            # If no better compression found, save with default optimization
-            img.save(output_path, format='PNG', optimize=True, compress_level=9)
-            
-        return best_size
+            print(f"Unexpected number of channels: {len(channels_data)}")
+            return None
     except Exception as e:
-        print(f"Error in advanced compression: {str(e)}")
+        print(f"Error retrieving layer image: {str(e)}")
         return None
+
+import os
+import numpy as np
+from matplotlib import pyplot
+from psdtags.psdtags import TiffImageSourceData, PsdChannelId, PsdKey
+import struct
+
+def cmyk_to_rgb(c, m, y, k):
+    r = 255 * (1 - c / 100) * (1 - k / 100)
+    g = 255 * (1 - m / 100) * (1 - k / 100)
+    b = 255 * (1 - y / 100) * (1 - k / 100)
+    return [r / 255, g / 255, b / 255]
+
+def lab_to_rgb(l, a, b):
+    y = (l + 16) / 116
+    x = a / 500 + y
+    z = y - b / 200
+
+    x = 0.95047 * (x * x * x if x * x * x > 0.008856 else (x - 16/116) / 7.787)
+    y = 1.00000 * (y * y * y if y * y * y > 0.008856 else (y - 16/116) / 7.787)
+    z = 1.08883 * (z * z * z if z * z * z > 0.008856 else (z - 16/116) / 7.787)
+
+    r = x *  3.2406 + y * -1.5372 + z * -0.4986
+    g = x * -0.9689 + y *  1.8758 + z *  0.0415
+    b = x *  0.0557 + y * -0.2040 + z *  1.0570
+
+    r = 1 if r > 1 else 0 if r < 0 else r
+    g = 1 if g > 1 else 0 if g < 0 else g
+    b = 1 if b > 1 else 0 if b < 0 else b
+
+    return [r, g, b]
 
 def extract_layers(file_path, output_dir):
     isd = TiffImageSourceData.fromtiff(file_path)
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    
+
     layers_info = []
     
-    if isd.layers:
-        for layer in isd.layers:
-            try:
-                image = layer.asarray()
-                layer_position_from_top = layer.offset[0]
-                layer_position_from_left = layer.offset[1]
-                
-                if image.size > 0:
-                    # Check if image contains transparency
-                    has_transparency = (image.shape[-1] == 4) if len(image.shape) > 2 else False
-                    
-                    layer_output_path = os.path.join(output_dir, f"{layer.name}.png")
-                    
-                    if not os.path.exists(layer_output_path):
-                        original_size = image.nbytes
-                        
-                        # Pre-process image if possible
-                        if not has_transparency:
-                            # Reduce color depth if possible
-                            if image.ndim == 3:
-                                image = np.uint8(image * 255)
-                                # Convert to grayscale if RGB channels are similar
-                                r, g, b = image[:,:,0], image[:,:,1], image[:,:,2]
-                                if np.allclose(r, g, rtol=0.05) and np.allclose(g, b, rtol=0.05):
-                                    image = np.mean(image, axis=2).astype(np.uint8)
+    # Get the dimensions from the first layer with actual data
+    full_width = full_height = 0
+    for layer in isd.layers:
+        if hasattr(layer, 'rectangle') and layer.rectangle:
+            _, _, bottom, right = layer.rectangle
+            full_width = max(full_width, right)
+            full_height = max(full_height, bottom)
+        image = layer.asarray()
+        if image.size > 0:
+            h, w = image.shape[:2]
+            full_width = max(full_width, w)
+            full_height = max(full_height, h)
 
-                        compressed_size = advanced_compress_png(image, layer_output_path)
-                        
-                        if compressed_size:
-                            compression_ratio = (original_size - compressed_size) / original_size * 100
-                            print(f"Layer {layer.name}: Compressed from {original_size/1024:.2f}KB to {compressed_size/1024:.2f}KB ({compression_ratio:.1f}% reduction)")
-                    
-                    layer_width, layer_height = None, None
-                    for channel in layer.channels:
-                        channel_data = np.array(channel.data)
-                        if layer_width is None and layer_height is None:
-                            layer_height, layer_width = channel_data.shape
-                            layers_info.append({
-                                'name': layer.name,
-                                'path': layer_output_path,
-                                'layer_position_from_top': layer_position_from_top,
-                                'layer_position_from_left': layer_position_from_left,
-                            })
-                else:
-                    print(f'Layer {layer.name!r} image size is zero')
-                    
+    # If we still don't have dimensions, try to get them from the TIFF file
+    if full_width == 0 or full_height == 0:
+        with Image.open(file_path) as img:
+            full_width, full_height = img.size
+
+    for layer in isd.layers:
+        layer_position_from_top = layer.offset[0]
+        layer_position_from_left = layer.offset[1]
+        
+        # Get layer dimensions from rectangle property if available
+        if hasattr(layer, 'rectangle') and layer.rectangle:
+            top, left, bottom, right = layer.rectangle
+            layer_height = bottom - top
+            layer_width = right - left
+        else:
+            # Use full image dimensions for color fill layers
+            layer_width = full_width
+            layer_height = full_height
+        
+        image = layer.asarray()
+        layer_output_path = os.path.join(output_dir, f"{layer.name}.png")
+
+        if image.size > 0:
+            pyplot.imsave(layer_output_path, image, cmap='gray' if image.ndim == 2 else None)
+        else:
+            # Handle Color Fill layers
+            color = None
+            channels_data = []
+            
+            try:
+                for channel in layer.channels:
+                    if channel.channelid in [PsdChannelId.CHANNEL0, PsdChannelId.CHANNEL1, PsdChannelId.CHANNEL2]:
+                        if channel.data.ndim == 2:
+                            channels_data.append(channel.data)
+                        else:
+                            print(f"Unexpected channel data shape: {channel.data.shape}")
+                
+                if len(channels_data) == 3:
+                    image_data = np.stack(channels_data, axis=-1)
+                    pyplot.imsave(layer_output_path, image_data)
+                    continue
             except Exception as e:
-                print(f"Error processing layer {layer.name}: {str(e)}")
+                print(f"Error processing channels: {str(e)}")
+            
+            # If channel processing failed, try color fill data
+            if hasattr(layer, 'info'):
+                for item in layer.info:
+                    if getattr(item, 'key', None) == PsdKey.SOLID_COLOR_SHEET_SETTING:
+                        color_data = item.value
+                        print(f"Full color data for {layer.name}: {color_data.hex()}")
+                        
+                        # Try to parse as RGB
+                        if len(color_data) >= 44:
+                            r, g, b = struct.unpack('>HHH', color_data[40:46])
+                            color = [x / 65535 for x in (r, g, b)]
+                            print(f"Parsed as RGB: {color}")
+                            break  # Stop after successful RGB parse
+                        
+            if color is not None:
+                solid_color_image = np.full((layer_height, layer_width, 3), color, dtype=np.float32)
+                pyplot.imsave(layer_output_path, solid_color_image)
+            else:
+                print(f'Layer {layer.name!r} color information not found')
                 continue
+
+        layers_info.append({
+            'name': layer.name,
+            'path': layer_output_path,
+            'layer_position_from_top': layer_position_from_top,
+            'layer_position_from_left': layer_position_from_left,
+            'width': layer_width,
+            'height': layer_height
+        })
 
     return layers_info
 
-# Optional: Add a function to check file sizes
-def get_file_size_mb(file_path):
-    """Get file size in MB"""
-    return os.path.getsize(file_path) / (1024 * 1024)
+# The main function remains the same as in the previous response
+def main():
+    # Specify the path to your TIFF file
+    tiff_file_path = 'flower-1 (copy 1).tif'
 
-# Optional: Add batch compression for existing files
-def compress_existing_files(directory):
-    """Compress all existing PNG files in directory"""
-    for filename in os.path.listdir(directory):
-        if filename.endswith('.png'):
-            file_path = os.path.join(directory, filename)
-            original_size = get_file_size_mb(file_path)
-            
-            # Create temporary path for new compressed file
-            temp_path = os.path.join(directory, f"temp_{filename}")
-            
-            # Open and recompress
-            try:
-                with Image.open(file_path) as img:
-                    img.save(temp_path, 
-                           format='PNG',
-                           optimize=True,
-                           compress_level=9,
-                           include_color_table=False)
-                
-                new_size = get_file_size_mb(temp_path)
-                
-                # Replace original with compressed version if smaller
-                if new_size < original_size:
-                    os.replace(temp_path, file_path)
-                    print(f"Compressed {filename}: {original_size:.2f}MB → {new_size:.2f}MB")
-                else:
-                    os.remove(temp_path)
-                    print(f"Kept original {filename} (already optimized)")
-                    
-            except Exception as e:
-                print(f"Error compressing {filename}: {str(e)}")
-                if os.path.exists(temp_path):
-                    os.remove(temp_path)
+    # Specify the output directory where you want to save the extracted layers
+    output_directory = 'output_images'
+
+    # Extract layers and get layer information
+    layers_info = extract_layers(tiff_file_path, output_directory)
+
+    # Print information for each layer
+    for idx, layer in enumerate(layers_info, 1):
+        print(f"\nLayer {idx}:")
+        print(f"Name: {layer['name']}")
+        print(f"Path: {layer['path']}")
+        print(f"Position from top: {layer['layer_position_from_top']}")
+        print(f"Position from left: {layer['layer_position_from_left']}")
+        print(f"Width: {layer['width']}")
+        print(f"Height: {layer['height']}")
+        
+        # Load the image to get more information
+        image = pyplot.imread(layer['path'])
+        
+        print(f"Image shape: {image.shape}")
+        print(f"Image dtype: {image.dtype}")
+        
+        if image.ndim == 3:
+            print(f"Number of channels: {image.shape[2]}")
+        elif image.ndim == 2:
+            print("Number of channels: 1 (Grayscale)")
+        
+        print(f"Image size: {image.size}")
+        print(f"Minimum pixel value: {image.min()}")
+        print(f"Maximum pixel value: {image.max()}")
+        
+        # Additional information from the original TIFF layer
+        tiff = TiffImageSourceData.fromtiff(tiff_file_path)
+        original_layer = next((l for l in tiff.layers if l.name == layer['name']), None)
+        if original_layer:
+            print(f"Original layer channels: {len(original_layer.channels)}")
+            for channel in original_layer.channels:
+                print(f"  Channel ID: {channel.channelid}")
+                print(f"  Channel shape: {channel.data.shape}")
+        
+        print("-" * 50)
+
+if __name__ == "__main__":
+    main()
 
 def extractColors():
     print("testing")

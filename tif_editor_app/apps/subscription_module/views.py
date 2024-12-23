@@ -10,6 +10,33 @@ from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
 from paypal.standard.forms import PayPalPaymentsForm
 
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib.admin.views.decorators import staff_member_required
+from .models import Color
+
+@require_POST
+@staff_member_required
+def update_color(request):
+    color_id = request.POST.get('color_id')
+    red = request.POST.get('red')
+    green = request.POST.get('green')
+    blue = request.POST.get('blue')
+
+    try:
+        color = Color.objects.get(id=color_id)
+        color.red = int(red)
+        color.green = int(green)
+        color.blue = int(blue)
+        color.save()
+        return JsonResponse({'success': True})
+    except Color.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Color not found'})
+    except ValueError:
+        return JsonResponse({'success': False, 'error': 'Invalid color values'})
+    
+    
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 def create_free_trial(user):
