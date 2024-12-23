@@ -1,18 +1,17 @@
-import logging
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.http import JsonResponse
 from .models import Contact
+from django.views.decorators.http import require_http_methods
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
-logger = logging.getLogger(__name__)
 
+@require_http_methods(["GET", "POST"])
 @login_required
 def contact_form_submission(request):
     if request.method == 'POST':
-        logger.debug(f"Received POST data: {request.POST}")
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
@@ -20,20 +19,13 @@ def contact_form_submission(request):
         message = request.POST.get('message')
         phone_number = request.POST.get('phone_number', '')
 
-        logger.debug(f"Processed form data: {first_name}, {last_name}, {email}, {subject}, {message}, {phone_number}")
-
         if email != request.user.email:
-            logger.warning(f"Email mismatch: form email {email}, user email {request.user.email}")
-            messages.error(request, "The email address must match your account email.")
-            return redirect('contact')
+            return JsonResponse({'status': 'error', 'message': "The email address must match your account email."})
 
         try:
             user = User.objects.get(email=email)
-            logger.debug(f"Found user: {user}")
         except User.DoesNotExist:
-            logger.warning(f"User with email {email} does not exist")
-            messages.error(request, "User with this email does not exist.")
-            return redirect('contact')
+            return JsonResponse({'status': 'error', 'message': "User with this email does not exist."})
 
         try:
             contact = Contact(
@@ -47,14 +39,9 @@ def contact_form_submission(request):
             )
             contact.full_clean()
             contact.save()
-            logger.info(f"Contact created: {contact}")
-            messages.success(request, "Your message has been sent successfully!")
-            return redirect('contact_success')
+            return JsonResponse({'status': 'success', 'message': "Your message has been sent successfully!"})
         except ValidationError as e:
-            logger.error(f"Validation error: {e}")
-            for field, errors in e.message_dict.items():
-                for error in errors:
-                    messages.error(request, f"{field}: {error}")
-            return redirect('contact')
+            errors = [f"{field}: {error}" for field, errors in e.message_dict.items() for error in errors]
+            return JsonResponse({'status': 'error', 'message': errors})
 
     return render(request, 'pages/contact.html')

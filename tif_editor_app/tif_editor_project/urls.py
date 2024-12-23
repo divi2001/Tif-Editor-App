@@ -23,6 +23,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('apps.api.urls')),
+    path('core/', include('apps.core.urls')),
     path('subscription/', include('apps.subscription_module.urls')),
     path('tif-editor/', include('apps.tif_to_picker.urls')),
     # path('mainadmin', include('apps.mainadmin.urls')),
