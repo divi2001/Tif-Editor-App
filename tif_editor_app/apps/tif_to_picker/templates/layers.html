@@ -94,7 +94,7 @@
       header {
         background: #fff !important;
         border-radius: 20px;
-        margin-bottom: 20px;
+        margin-bottom:15px;
         width: 100%;
       }
 
@@ -118,8 +118,13 @@
         background-color: #f8f9fa;
         overflow-y: auto;
         transition: all 0.3s;
+        position: relative;
       }
-
+      
+      .sidebar .nav-btn{
+        position: absolute;
+        right: 7px;
+      }
       .collapsed {
         flex: 0 0 46px !important;
       }
@@ -161,13 +166,20 @@
         border-radius: 20px;
         height: 100vh;
       }
+      .upload-btn{
+        color: white;
+        border: none;
+      }
+      .bg-linear-blue{
+        background: linear-gradient(to right, #7a85eb , #3C4CD1);
+      }
     </style>
     <style>
       body {
         font-family: "Arial", sans-serif;
         background-color: #f8f9fa;
         margin: 0;
-        padding: 20px;
+        padding:15px;
       }
       h1 {
         text-align: center;
@@ -335,8 +347,7 @@
 
       .pcr-button {
           width: 40px;
-          height: 40px;
-          border-radius: 50%;
+          height:38px;
           border: none;
           cursor: pointer;
       }
@@ -603,8 +614,8 @@
       }
 
       .color-swatch {
-          width: 100px; /* Full width within the grid cell */
-          height: 20px; /* Fixed height for uniformity */
+          width: 125px; /* Full width within the grid cell */
+          height: 25px; /* Fixed height for uniformity */
           //border-radius: 5px; /* Rounded corners */
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional shadow */
           cursor: pointer;
@@ -748,13 +759,13 @@
 .pdf-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);  /* Two columns */
-  gap: 20px;
-  padding: 20px;
+  gap:10px;
   max-width: 1200px;  /* Maximum width for the container */
   margin: 0 auto;     /* Center the grid */
 }
 
 .pdf-item {
+  height: 170px;
   border: 1px solid #ddd;
   border-radius: 8px;
   overflow: hidden;
@@ -763,6 +774,7 @@
 }
 
 .pdf-preview {
+  height: 100%;
   position: relative;
   cursor: pointer;
 }
@@ -800,7 +812,11 @@
   padding: 2px 8px;
   font-size: 12px;
 }
-
+.visualizer_buttons_left{
+  display:flex!important;
+  align-items: center;
+  gap: 10px;
+}
 /* Responsive behavior for smaller screens */
 @media (max-width: 768px) {
   .pdf-grid {
@@ -926,7 +942,7 @@
     </div>
     <!-- Header -->
     <header
-      class="text-dark p-3 d-flex align-items-center justify-content-between ms-auto me-auto"
+      class="text-dark p-2 px-3 d-flex align-items-center justify-content-between ms-auto me-auto"
     >
       <!-- Left: Icon -->
       <div class="header-logo">
@@ -1027,25 +1043,32 @@
       </div>
 
 
-        <div id="secondaryColumn" class="sidebar d-flex flex-column" style="flex: 0 0 330px">
-          <button class="btn-sm m-2 d-flex align-items-center" onclick="toggleSidebar('secondaryColumn', this)" style="border: none; background: #fff">
+        <div id="secondaryColumn" class="sidebar d-flex flex-column" style="flex: 0 0 310px">
+          <button class="btn-sm m-2 d-flex align-items-center nav-btn" onclick="toggleSidebar('secondaryColumn', this)" style="border: none; background: #fff">
               <i class="bi bi-caret-left-fill ms-auto"></i>
           </button>
           
           <!-- Trending Content -->
-          <div class="sidebar-content m-4" id="trendingContent" style="display: none;">
+          <div class="sidebar-content" id="trendingContent" style="display: none;">
               <h4 class="ms-auto me-auto">Trending Palette</h4>
-              <div class="layer-toggles">
+              <hr />
+              <div class="layer-toggles d-flex gap-3 justify-content-center flex-wrap">
+          
                   {% for layer in layers %}
-                  <hr />
-                  <div class="layer-toggle-item">
+              
+                  <div class="layer-toggle-item d-flex flex-column gap-2">
                       <div id="colorPalette_{{ forloop.counter }}" class="color-palette d-flex flex-column"></div>
-                      <button id="shufflePalette_{{ forloop.counter }}" class="btn btn-sm btn-primary mb-2">
+                      <div class="d-flex align-items-center justify-content-between w-100">
+                        <button id="shufflePalette_{{ forloop.counter }}" class="btn btn-sm btn-primary">
                           <i class="bi bi-shuffle"></i>
                       </button>
-                      <button type="button" id="applyButton_{{ forloop.counter }}" class="btn btn-success mx-2">
+                      <button type="button" id="" class="btn">
+                        <i class="bi bi-heart"></i>
+                    </button>
+                      <button type="button" id="applyButton_{{ forloop.counter }}" class="btn btn-success">
                           <i class="bi bi-magic"></i>
                       </button>
+                      </div>
                   </div>
                   {% endfor %}
               </div>
@@ -1059,7 +1082,7 @@
                 </div>
             </div>
         </div>
-        <div class="sidebar-content m-4" id="effectsContent" style="display: none;">
+        <div class="sidebar-content" id="effectsContent" style="display: none;">
           <h4 class="ms-auto me-auto">Effects</h4>
           <div class="effects-grid">
               <div class="effect-item" data-effect="grayscale">
@@ -1088,13 +1111,65 @@
               </div>
           </div>
       </div>
+       <!-- SS Collection Content -->
+    <div class="sidebar-content" id="ssCollectionContent" style="display: none;">
+      <h4 class="ms-auto me-auto">SS Collection</h4>
+      <hr />
+      <div class="layer-toggles d-flex gap-3 justify-content-center flex-wrap">
+          
+        {% for layer in layers %}
+    
+        <div class="layer-toggle-item d-flex flex-column gap-2">
+            <div id="colorPalette_{{ forloop.counter }}" class="color-palette d-flex flex-column"></div>
+            <div class="d-flex align-items-center justify-content-between w-100">
+              <button id="shufflePalette_{{ forloop.counter }}" class="btn btn-sm btn-primary">
+                <i class="bi bi-shuffle"></i>
+            </button>
+            <button type="button" id="" class="btn">
+              <i class="bi bi-heart"></i>
+          </button>
+            <button type="button" id="applyButton_{{ forloop.counter }}" class="btn btn-success">
+                <i class="bi bi-magic"></i>
+            </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+  </div>
+
+  <!-- AW Collection Content -->
+  <div class="sidebar-content" id="awCollectionContent" style="display: none;">
+      <h4 class="ms-auto me-auto">AW Collection</h4>
+      <hr />
+      <div class="layer-toggles d-flex gap-3 justify-content-center flex-wrap">
+          
+        {% for layer in layers %}
+    
+        <div class="layer-toggle-item d-flex flex-column gap-2">
+            <div id="colorPalette_{{ forloop.counter }}" class="color-palette d-flex flex-column"></div>
+            <div class="d-flex align-items-center justify-content-between w-100">
+              <button id="shufflePalette_{{ forloop.counter }}" class="btn btn-sm btn-primary">
+                <i class="bi bi-shuffle"></i>
+            </button>
+            <button type="button" id="" class="btn">
+              <i class="bi bi-heart"></i>
+          </button>
+            <button type="button" id="applyButton_{{ forloop.counter }}" class="btn btn-success">
+                <i class="bi bi-magic"></i>
+            </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+      </div>
+  </div>
       </div>
 
 
       <!-- Main Content -->
       <div id="mainContent" class="content">
         <div class="d-flex align-items-center justify-content-between">
-          <h2 class="me-3">Workspace</h2>
+          <h2 class="fs-4 fw-bold">Workspace</h2>
           <div class="zoom-controls">
             <label for="zoomSlider" class="me-2">Zoom:</label>
             <input
@@ -1230,55 +1305,113 @@
     </main>
 
   <!-- Footer -->
-<footer class="bg-light text-center py-3 mt-auto visualizer_toolbar">
-  <div id="visualizer_buttons_left">
+<footer class="bg-light text-center py-2 mt-auto visualizer_toolbar d-flex align-items-center justify-content-center gap-4">
+     
+  <div id="visualizer_buttons_left ">
+    <div class="d-flex align-items-center gap-2">
       <div class="upload-wrapper">
-          <form id="uploadForm" method="post" enctype="multipart/form-data">
-              {% csrf_token %}
-              <input type="file" id="fileInput" name="tiff_file" accept=".tif" style="display: none;">
-              <button type="button" class="btn btn-outline-dark m-0 p-2" onclick="document.getElementById('fileInput').click();">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud-upload" viewBox="0 0 16 16">
-                      <path fill-rule="evenodd" d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383"/>
-                      <path fill-rule="evenodd" d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708z"/>
-                  </svg>
-                  Upload
-              </button>
-          </form>
-      </div>
+        <form id="uploadForm" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" id="fileInput" name="tiff_file" accept=".tif" style="display: none;">
+            <button type="button" class="btn btn-outline-dark upload-btn m-0 p-2 px-3 bg-linear-blue" onclick="document.getElementById('fileInput').click();">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud-upload" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383"/>
+                    <path fill-rule="evenodd" d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708z"/>
+                </svg>
+                Upload
+            </button>
+        </form>
+    </div>
 
-      <div class="image-adjustments">
-          <button type="button" class="btn btn-outline-dark" id="adjustmentToggle">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sliders2-vertical" viewBox="0 0 16 16">
-                  <path fill-rule="evenodd" d="M0 10.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1H3V1.5a.5.5 0 0 0-1 0V10H.5a.5.5 0 0 0-.5.5M2.5 12a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 1 0v-2a.5.5 0 0 0-.5-.5m3-6.5A.5.5 0 0 0 6 6h1.5v8.5a.5.5 0 0 0 1 0V6H10a.5.5 0 0 0 0-1H6a.5.5 0 0 0-.5.5M8 1a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 1 0v-2A.5.5 0 0 0 8 1m3 9.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1H14V1.5a.5.5 0 0 0-1 0V10h-1.5a.5.5 0 0 0-.5.5m2.5 1.5a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 1 0v-2a.5.5 0 0 0-.5-.5"/>
-              </svg>
-          </button>
-          <div id="adjustmentPanel" class="adjustment-panel" style="display: none;">
-              <div class="sliders-container"></div>
-          </div>
+    
+    <div class="image-adjustments">
+      <button type="button" class="btn shadow-lg " id="adjustmentToggle">
+        <svg width="19" height="19" viewBox="0 0 34 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g clip-path="url(#clip0_384_2340)">
+            <path
+              d="M32.186 15.2545H13.3887C12.7572 12.7733 10.2339 11.2738 7.75261 11.9053C6.10713 12.3241 4.82225 13.609 4.40344 15.2545H1.90915C1.26599 15.2545 0.744629 15.7759 0.744629 16.419C0.744629 17.0622 1.26599 17.5835 1.90915 17.5835H4.40351C5.035 20.0647 7.55836 21.5641 10.0396 20.9326C11.6851 20.5138 12.97 19.2289 13.3888 17.5835H32.186C32.8291 17.5835 33.3505 17.0621 33.3505 16.4189C33.3505 15.7758 32.8291 15.2545 32.186 15.2545ZM8.89611 18.748C7.60987 18.748 6.56715 17.7053 6.56715 16.419C6.56715 15.1328 7.60987 14.09 8.89611 14.09C10.1824 14.09 11.2251 15.1328 11.2251 16.419C11.2251 17.7053 10.1824 18.748 8.89611 18.748Z"
+              fill="#3C4CD1" />
+            <path
+              d="M32.1862 3.60947H28.5274C27.8959 1.12828 25.3726 -0.371188 22.8913 0.260301C21.2458 0.679109 19.9609 1.96399 19.5421 3.60947H1.90939C1.26623 3.60947 0.744873 4.13084 0.744873 4.77399C0.744873 5.41715 1.26623 5.93851 1.90939 5.93851H19.5421C20.1736 8.4197 22.697 9.91917 25.1782 9.28768C26.8237 8.86887 28.1086 7.58399 28.5274 5.93851H32.1862C32.8294 5.93851 33.3507 5.41715 33.3507 4.77399C33.3507 4.13084 32.8294 3.60947 32.1862 3.60947ZM24.0348 7.10296C22.7486 7.10296 21.7058 6.06023 21.7058 4.77399C21.7058 3.48775 22.7486 2.44502 24.0348 2.44502C25.3211 2.44502 26.3638 3.48775 26.3638 4.77399C26.3638 6.06023 25.3211 7.10296 24.0348 7.10296Z"
+              fill="#3C4CD1" />
+            <path
+              d="M32.186 26.8993H26.1981C25.5667 24.4181 23.0433 22.9186 20.562 23.5501C18.9165 23.9689 17.6317 25.2538 17.2129 26.8993H1.90915C1.26599 26.8993 0.744629 27.4206 0.744629 28.0637C0.744629 28.7068 1.26599 29.2282 1.90915 29.2282H17.2129C17.8444 31.7094 20.3678 33.2089 22.849 32.5774C24.4945 32.1586 25.7794 30.8737 26.1982 29.2282H32.186C32.8291 29.2282 33.3505 28.7069 33.3505 28.0637C33.3505 27.4206 32.8291 26.8993 32.186 26.8993ZM21.7055 30.3928C20.4193 30.3928 19.3766 29.35 19.3766 28.0638C19.3766 26.7775 20.4193 25.7348 21.7055 25.7348C22.9918 25.7348 24.0345 26.7775 24.0345 28.0638C24.0345 29.35 22.9918 30.3928 21.7055 30.3928Z"
+              fill="#3C4CD1" />
+          </g>
+          <defs>
+            <clipPath id="clip0_384_2340">
+              <rect width="32.6059" height="32.6059" fill="white" transform="translate(0.744873 0.115967)" />
+            </clipPath>
+          </defs>
+        </svg>
+      </button>
+      <div id="adjustmentPanel" class="adjustment-panel" style="display: none;">
+          <div class="sliders-container"></div>
       </div>
+    </div>
+    
+
+   
+    </div>
   </div>
 
   <div id="visualizer_palette" class="palette-wrapper">
       <!-- Left Scroll Button -->
       <button id="scroll-left" class="btn btn-outline-info"><</button>
-      <div class="palette-selector has-btns is-sortable has-picker is-lockable is-sortable has-picker is-lockable scroll-container" data-colors="10">
-          <div class="color-picker-container mt-1" id="image-color-pickers"></div>
+      <div class="palette-selector has-btns is-sortable has-picker is-lockable is-sortable has-picker is-lockable scroll-container" style="height: 100%;" data-colors="10">
+          <div class="color-picker-container mt-1 rounded-2" style="width: fit-content;overflow: hidden;" id="image-color-pickers"></div>
       </div>
       <button id="scroll-right" class="btn btn-outline-info">></button>
   </div>
-  <button type="button" class="btn btn-success2">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shuffle" viewBox="0 0 16 16">
-        <path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"/>
-        <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z"/>
+  <button type="button" class="btn btn-success2 shadow-lg">
+    <svg width="20" height="20" viewBox="0 0 33 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M19.3118 12.7204C20.2116 11.807 21.2664 11.3242 22.3622 11.3242H26.2204L24.7538 12.7908C24.6119 12.9327 24.4993 13.1012 24.4225 13.2867C24.3457 13.4721 24.3061 13.6708 24.3061 13.8716C24.3061 14.0723 24.3457 14.271 24.4225 14.4565C24.4993 14.6419 24.6119 14.8104 24.7538 14.9523C25.0404 15.239 25.4292 15.4 25.8346 15.4C26.0353 15.4 26.234 15.3605 26.4195 15.2837C26.6049 15.2068 26.7734 15.0943 26.9153 14.9523L30.9911 10.8766C31.133 10.7347 31.2456 10.5662 31.3224 10.3807C31.3992 10.1953 31.4388 9.99654 31.4388 9.79583C31.4388 9.59511 31.3992 9.39635 31.3224 9.21091C31.2456 9.02547 31.133 8.85698 30.9911 8.71505L26.9153 4.63932C26.7734 4.49739 26.6049 4.38481 26.4195 4.308C26.234 4.23118 26.0353 4.19165 25.8346 4.19165C25.6338 4.19165 25.4351 4.23118 25.2497 4.308C25.0642 4.38481 24.8957 4.49739 24.7538 4.63932C24.6119 4.78125 24.4993 4.94974 24.4225 5.13518C24.3457 5.32062 24.3061 5.51937 24.3061 5.72009C24.3061 5.92081 24.3457 6.11956 24.4225 6.305C24.4993 6.49044 24.6119 6.65893 24.7538 6.80086L26.2204 8.26742H22.3622C20.0744 8.26742 17.9771 9.41812 16.468 11.3292C17.1472 12.3407 17.6686 13.4496 18.0142 14.6179C18.3375 13.9172 18.7761 13.2758 19.3118 12.7204Z"
+        fill="#3C4CD1" />
+      <path
+        d="M12.3627 20.1175C11.4628 21.0308 10.408 21.5136 9.31225 21.5136H3.41829C3.01294 21.5136 2.62418 21.6746 2.33755 21.9613C2.05092 22.2479 1.88989 22.6367 1.88989 23.042C1.88989 23.4474 2.05092 23.8361 2.33755 24.1228C2.62418 24.4094 3.01294 24.5704 3.41829 24.5704H9.31225C11.6 24.5704 13.6974 23.4197 15.2065 21.5086C14.5272 20.4972 14.0058 19.3883 13.66 18.22C13.3368 18.9206 12.8983 19.562 12.3627 20.1175Z"
+        fill="#3C4CD1" />
+      <path
+        d="M26.9156 17.8854C26.7737 17.7434 26.6052 17.6309 26.4197 17.554C26.2343 17.4772 26.0355 17.4377 25.8348 17.4377C25.6341 17.4377 25.4354 17.4772 25.2499 17.554C25.0645 17.6309 24.896 17.7434 24.7541 17.8854C24.6121 18.0273 24.4995 18.1958 24.4227 18.3812C24.3459 18.5667 24.3064 18.7654 24.3064 18.9661C24.3064 19.1669 24.3459 19.3656 24.4227 19.551C24.4995 19.7365 24.6121 19.905 24.7541 20.0469L26.2207 21.5135H22.3625C21.2667 21.5135 20.2119 21.0307 19.3121 20.1173C18.3449 19.1357 17.6439 17.7197 17.3383 16.1302C16.4479 11.5006 13.1475 8.26733 9.31225 8.26733H3.41829C3.01294 8.26733 2.62418 8.42836 2.33755 8.71499C2.05092 9.00162 1.88989 9.39038 1.88989 9.79573C1.88989 10.2011 2.05092 10.5898 2.33755 10.8765C2.62418 11.1631 3.01294 11.3241 3.41829 11.3241H9.31225C10.408 11.3241 11.4628 11.8069 12.3627 12.7203C13.3298 13.7019 14.0307 15.1179 14.3364 16.7074C15.2268 21.3369 18.5272 24.5703 22.3625 24.5703H26.2207L24.7541 26.0368C24.4674 26.3235 24.3064 26.7122 24.3064 27.1176C24.3064 27.523 24.4674 27.9117 24.7541 28.1984C25.0407 28.485 25.4295 28.646 25.8348 28.646C26.2402 28.646 26.629 28.485 26.9156 28.1984L30.9913 24.1226C31.1333 23.9807 31.2459 23.8122 31.3227 23.6268C31.3995 23.4413 31.439 23.2426 31.439 23.0419C31.439 22.8412 31.3995 22.6424 31.3227 22.457C31.2459 22.2715 31.1333 22.103 30.9913 21.9611L26.9156 17.8854Z"
+        fill="#3C4CD1" />
     </svg>
-    Shuffle
 </button>
 
+
 <div class="harmony-container">
-  <button type="button" class="btn btn-success3" id="harmonyButton">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-up" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
-      </svg>
+  <button type="button" class="btn shadow-lg" id="harmonyButton">
+    <svg width="20" height="20" viewBox="0 0 34 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M7.69539 17.8844C6.91996 17.8844 6.46696 17.0055 6.91804 16.3738L9.19939 13.18L7.93224 8.66352C7.73201 7.94992 8.38976 7.28364 9.11004 7.48571L13.6265 8.75287L16.8203 6.47152C17.4513 6.02094 18.3309 6.47266 18.3309 7.24887V11.3504L22.0167 14.0551C22.6998 14.5563 22.4375 15.6362 21.601 15.7687L20.2474 15.9831L31.9226 26.3235C33.5103 27.7129 33.5925 30.1613 32.1001 31.6535C30.6084 33.1454 28.1582 33.0626 26.7737 31.4803L16.4296 19.8007L16.2153 21.1543C16.0828 21.9906 15.0027 22.2532 14.5016 21.57L11.7969 17.8843H7.69539V17.8844ZM28.2078 30.2179C28.8759 30.9815 30.0421 31.0098 30.7492 30.3026C31.4508 29.6011 31.4362 28.4367 30.6601 27.7575L22.3717 20.4168L20.8633 21.9252L28.2078 30.2179ZM19.5943 20.4923L20.9388 19.1478L17.8028 16.3703L16.9517 16.5051L16.8168 17.3563L19.5943 20.4923ZM13.0509 16.3639L14.6866 18.5929C16.1333 9.45991 13.753 24.4867 15.1732 15.5207C15.238 15.112 15.5586 14.7914 15.9673 14.7267C16.6508 14.6184 18.4071 14.3402 19.0395 14.24L16.8105 12.6043C16.5652 12.4244 16.4204 12.1384 16.4204 11.8342V9.10505L14.3646 10.5736C14.129 10.7418 13.8299 10.7943 13.5512 10.716L10.2311 9.78445L11.1626 13.1046C11.2408 13.3833 11.1884 13.6823 11.0202 13.9179L9.5517 15.9737H12.2808C12.585 15.9738 12.871 16.1186 13.0509 16.3639Z"
+        fill="#3C4CD1" />
+      <path
+        d="M4.5745 3.55524H4.00133V4.12841C4.00133 4.65598 3.57361 5.0837 3.04604 5.0837C2.51847 5.0837 2.09076 4.65598 2.09076 4.12841V3.55524H1.51759C0.990013 3.55524 0.5623 3.12753 0.5623 2.59995C0.5623 2.07238 0.990013 1.64467 1.51759 1.64467H2.09076V1.0715C2.09076 0.543924 2.51847 0.116211 3.04604 0.116211C3.57361 0.116211 4.00133 0.543924 4.00133 1.0715V1.64467H4.5745C5.10207 1.64467 5.52979 2.07238 5.52979 2.59995C5.52979 3.12753 5.10214 3.55524 4.5745 3.55524Z"
+        fill="#3C4CD1" />
+      <path
+        d="M14.8284 4.638H14.2552V5.21117C14.2552 5.73875 13.8275 6.16646 13.2999 6.16646C12.7724 6.16646 12.3447 5.73875 12.3447 5.21117V4.638H11.7715C11.2439 4.638 10.8162 4.21029 10.8162 3.68272C10.8162 3.15514 11.2439 2.72743 11.7715 2.72743H12.3447V2.15426C12.3447 1.62669 12.7724 1.19897 13.2999 1.19897C13.8275 1.19897 14.2552 1.62669 14.2552 2.15426V2.72743H14.8284C15.356 2.72743 15.7837 3.15514 15.7837 3.68272C15.7837 4.21029 15.356 4.638 14.8284 4.638Z"
+        fill="#3C4CD1" />
+      <path
+        d="M5.08409 14.3818C5.08409 14.9094 4.65638 15.3371 4.12881 15.3371C3.60123 15.3371 3.17352 14.9094 3.17352 14.3818V13.8087H2.60035C2.07278 13.8087 1.64506 13.3809 1.64506 12.8534C1.64506 12.3258 2.07278 11.8981 2.60035 11.8981H3.17352V11.3249C3.17352 10.7973 3.60123 10.3696 4.12881 10.3696C4.65638 10.3696 5.08409 10.7973 5.08409 11.3249V11.8981H5.65726C6.18484 11.8981 6.61255 12.3258 6.61255 12.8534C6.61255 13.3809 6.18484 13.8087 5.65726 13.8087H5.08409V14.3818Z"
+        fill="#3C4CD1" />
+      <path
+        d="M1.51759 21.0687H2.09076V20.4956C2.09076 19.968 2.51847 19.5403 3.04604 19.5403C3.57361 19.5403 4.00133 19.968 4.00133 20.4956V21.0687H4.5745C5.10207 21.0687 5.52979 21.4965 5.52979 22.024C5.52979 22.5516 5.10207 22.9793 4.5745 22.9793H4.00133V23.5525C4.00133 24.0801 3.57361 24.5078 3.04604 24.5078C2.51847 24.5078 2.09076 24.0801 2.09076 23.5525V22.9793H1.51759C0.990013 22.9793 0.5623 22.5516 0.5623 22.024C0.5623 21.4965 0.990013 21.0687 1.51759 21.0687Z"
+        fill="#3C4CD1" />
+      <path
+        d="M23.9988 3.55524H23.4256V4.12841C23.4256 4.65598 22.9979 5.0837 22.4704 5.0837C21.9428 5.0837 21.5151 4.65598 21.5151 4.12841V3.55524H20.9419C20.4143 3.55524 19.9866 3.12753 19.9866 2.59995C19.9866 2.07238 20.4143 1.64467 20.9419 1.64467H21.5151V1.0715C21.5151 0.543924 21.9428 0.116211 22.4704 0.116211C22.9979 0.116211 23.4256 0.543924 23.4256 1.0715V1.64467H23.9988C24.5264 1.64467 24.9541 2.07238 24.9541 2.59995C24.9541 3.12753 24.5265 3.55524 23.9988 3.55524Z"
+        fill="#3C4CD1" />
+      <path
+        d="M27.53 7.569L23.9636 9.60694C23.5076 9.86761 22.9232 9.71164 22.6602 9.25151C22.3985 8.79342 22.5576 8.20993 23.0157 7.94812L26.5821 5.91017C27.04 5.64849 27.6236 5.80758 27.8855 6.2656C28.1472 6.72376 27.988 7.30725 27.53 7.569Z"
+        fill="#3C4CD1" />
+      <path
+        d="M29.6047 13.2993C29.5196 13.2993 29.8828 13.3415 25.4091 12.7823C24.8855 12.7169 24.5142 12.2394 24.5797 11.7159C24.6451 11.1923 25.1227 10.8204 25.6461 10.8865L29.722 11.396C30.2455 11.4614 30.6169 11.9389 30.5513 12.4624C30.491 12.9456 30.0795 13.2993 29.6047 13.2993Z"
+        fill="#3C4CD1" />
+      <path
+        d="M8.3946 22.5692C8.65641 22.1111 9.23996 21.9519 9.69799 22.2137C10.156 22.4755 10.3152 23.059 10.0534 23.5171L8.01548 27.0835C7.83913 27.3921 7.51682 27.5651 7.18521 27.5651C6.46435 27.5651 5.989 26.7791 6.35666 26.1356L8.3946 22.5692Z"
+        fill="#3C4CD1" />
+      <path
+        d="M12.1622 24.133C12.6859 24.0673 13.1632 24.439 13.2286 24.9624L13.7381 29.0383C13.8092 29.6067 13.3665 30.1121 12.789 30.1121C12.3143 30.1121 11.9027 29.7585 11.8424 29.2752L11.3329 25.1993C11.2673 24.6759 11.6387 24.1984 12.1622 24.133Z"
+        fill="#3C4CD1" />
+    </svg>
       Generate
   </button>
   <div class="harmony-menu" id="harmonyMenu" style="display: none;">
@@ -1302,15 +1435,13 @@
   <div class="menu-item" data-harmony="Square">Square</div>
 </div>
 
-
-
-  <div id="visualizer_buttons">
+  <div id="visualizer_buttons" class="rounded-2 d-flex bg-linear-blue">
       <button type="button" class="btn btn-success1">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
-              <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
-              <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
-          </svg>
-          Export
+        <svg width="22" height="22" viewBox="0 0 33 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M23.2749 28.3968C22.9097 28.803 22.4518 29.115 21.9402 29.3062C21.4286 29.4974 20.8784 29.5623 20.3363 29.4952H6.07123C3.57168 29.4952 2.50497 28.4285 2.50497 25.929V6.90888C2.50497 4.40932 3.57168 3.34261 6.07123 3.34261H14.3925V6.90888C14.2994 7.71194 14.3892 8.52565 14.655 9.28915C14.9207 10.0526 15.3557 10.7462 15.9274 11.3178C16.499 11.8895 17.1925 12.3244 17.956 12.5902C18.7195 12.856 19.5332 12.9457 20.3363 12.8527H23.9026V16.4189C23.9026 16.7342 24.0278 17.0366 24.2507 17.2595C24.4737 17.4824 24.7761 17.6077 25.0913 17.6077C25.4066 17.6077 25.709 17.4824 25.9319 17.2595C26.1548 17.0366 26.2801 16.7342 26.2801 16.4189V11.6639C26.2802 11.5078 26.2495 11.3532 26.1896 11.2091C26.1298 11.0649 26.042 10.934 25.9314 10.8239L16.4213 1.3138C16.3112 1.20317 16.1803 1.11541 16.0361 1.05557C15.892 0.995725 15.7374 0.96498 15.5813 0.965102H6.07123C5.26818 0.872024 4.45446 0.961736 3.69097 1.22753C2.92748 1.49332 2.23397 1.92831 1.66231 2.49996C1.09066 3.07161 0.655674 3.76512 0.389882 4.52862C0.12409 5.29211 0.0343773 6.10582 0.127455 6.90888V25.929C0.0343773 26.732 0.12409 27.5457 0.389882 28.3092C0.655674 29.0727 1.09066 29.7662 1.66231 30.3379C2.23397 30.9095 2.92748 31.3445 3.69097 31.6103C4.45446 31.8761 5.26818 31.9658 6.07123 31.8728H20.3363C21.2537 31.9506 22.1762 31.8025 23.0231 31.4414C23.87 31.0802 24.6155 30.5171 25.1944 29.8012C25.3806 29.5466 25.4581 29.2285 25.4098 28.9169C25.3615 28.6052 25.1913 28.3255 24.9368 28.1393C24.6823 27.953 24.3642 27.8756 24.0525 27.9239C23.7408 27.9722 23.4611 28.1423 23.2749 28.3968ZM16.77 6.90888V5.02431L22.2209 10.4751H20.3363C17.8367 10.4751 16.77 9.40844 16.77 6.90888ZM32.2714 23.599L29.1014 26.769C28.8761 26.979 28.578 27.0933 28.27 27.0879C27.9621 27.0825 27.6682 26.9577 27.4504 26.7399C27.2326 26.5221 27.1079 26.2283 27.1024 25.9203C27.097 25.6123 27.2113 25.3143 27.4213 25.0889L28.5609 23.9477H17.1663C16.851 23.9477 16.5486 23.8225 16.3257 23.5995C16.1028 23.3766 15.9775 23.0742 15.9775 22.759C15.9775 22.4437 16.1028 22.1413 16.3257 21.9184C16.5486 21.6954 16.851 21.5702 17.1663 21.5702H28.5609L27.4213 20.429C27.2113 20.2036 27.097 19.9056 27.1024 19.5976C27.1079 19.2897 27.2326 18.9958 27.4504 18.778C27.6682 18.5602 27.9621 18.4355 28.27 18.43C28.578 18.4246 28.8761 18.5389 29.1014 18.7489L32.2714 21.9189C32.3809 22.0302 32.4681 22.1615 32.5282 22.3056C32.6179 22.5227 32.6415 22.7615 32.5958 22.992C32.5501 23.2224 32.4372 23.4326 32.2714 23.599Z"
+            fill="white" />
+        </svg>
       </button>
 
   </div>
@@ -1418,6 +1549,8 @@ document.getElementById('fileInput').onchange = function() {
         const inspirationButton = document.getElementById('inspirationButton');
         const trendingContent = document.getElementById('trendingContent');
         const inspirationContent = document.getElementById('inspirationContent');
+        const ssCollectionContent = document.getElementById('ssCollectionContent');
+        const awCollectionContent = document.getElementById('awCollectionContent');
         
         // Function to show content
         function showContent(contentId) {
@@ -1459,39 +1592,40 @@ document.getElementById('fileInput').onchange = function() {
                     case 'trendingButton':
                         secondaryColumn.style.display = 'flex';
                         showContent('trendingContent');
-                        // If the sidebar is collapsed, uncollapse it
-                        if (secondaryColumn.classList.contains('collapsed')) {
-                            const toggleButton = secondaryColumn.querySelector('button');
-                            toggleSidebar('secondaryColumn', toggleButton);
-                        }
                         break;
                         
                     case 'inspirationButton':
                         secondaryColumn.style.display = 'flex';
                         showContent('inspirationContent');
-                        if (secondaryColumn.classList.contains('collapsed')) {
-                            const toggleButton = secondaryColumn.querySelector('button');
-                            toggleSidebar('secondaryColumn', toggleButton);
-                        }
                         break;
                         
                     case 'effectsButton':
                         secondaryColumn.style.display = 'flex';
                         showContent('effectsContent');
-                        if (secondaryColumn.classList.contains('collapsed')) {
-                            const toggleButton = secondaryColumn.querySelector('button');
-                            toggleSidebar('secondaryColumn', toggleButton);
-                        }
+                        break;
+                        
+                    case 'ssCollectionButton':
+                        secondaryColumn.style.display = 'flex';
+                        showContent('ssCollectionContent');
+                        break;
+                        
+                    case 'awCollectionButton':
+                        secondaryColumn.style.display = 'flex';
+                        showContent('awCollectionContent');
                         break;
                         
                     case 'favoriteButton':
                     case 'baseColorButton':
-                    case 'ssCollectionButton':
-                    case 'awCollectionButton':
                     default:
                         // Hide secondary column for all other buttons
                         secondaryColumn.style.display = 'none';
                         break;
+                }
+                
+                // If the sidebar is collapsed, uncollapse it
+                if (secondaryColumn.classList.contains('collapsed')) {
+                    const toggleButton = secondaryColumn.querySelector('button');
+                    toggleSidebar('secondaryColumn', toggleButton);
                 }
             });
         });
@@ -1687,11 +1821,10 @@ function loadInspirationContent() {
                               <span class="pdf-name">${pdf.title}</span>
                               <div class="pdf-actions">
                                   <span class="pdf-likes">
-                                      <i class="bi ${pdf.liked ? 'bi-heart-fill' : 'bi-heart'}" onclick="toggleLike(${pdf.id}, this)"></i> 
+                                      <i class="bi ${pdf.liked ? 'bi-heart-fill' : 'bi-heart'}"></i> 
                                       <span class="likes-count">${pdf.likes_count}</span>
                                   </span>
-                                  <button class="btn btn-sm btn-primary download-btn" 
-                                          onclick="downloadPDF('${pdf.pdf_url}', '${pdf.title}')">
+                                  <button class="btn btn-sm btn-primary download-btn">
                                       <i class="bi bi-download"></i>
                                   </button>
                               </div>
@@ -1707,6 +1840,7 @@ function loadInspirationContent() {
           `;
 
           inspirationContent.innerHTML = htmlContent;
+          initializePDFEvents(); // Call this after adding the content
       })
       .catch(error => {
           console.error('Error:', error);
@@ -1726,8 +1860,8 @@ function toggleLike(pdfId, element) {
   .then(response => response.json())
   .then(data => {
       // Update the like button and count based on the response
-      element.className = data.liked ? 'bi bi-heart-fill' : 'bi bi-heart';
-      element.nextElementSibling.textContent = data.likes_count;
+      element.className = data.liked ? 'bi bi-heart-fill' : 'bi-heart';
+      element.closest('.pdf-likes').querySelector('.likes-count').textContent = data.likes_count;
   })
   .catch(error => console.error('Error:', error));
 }
@@ -1747,8 +1881,6 @@ function getCookie(name) {
   return cookieValue;
 }
 
-// Call this function when the page loads
-loadInspirationContent();
 function downloadPDF(pdfUrl, title) {
   fetch(pdfUrl)
       .then(response => response.blob())
@@ -1769,29 +1901,39 @@ function downloadPDF(pdfUrl, title) {
 }
 
 function initializePDFEvents() {
-  // Add any additional event listeners for the PDF items
-  document.querySelectorAll('.pdf-likes').forEach(element => {
+  document.querySelectorAll('.pdf-likes i').forEach(element => {
       element.addEventListener('click', function(e) {
           e.stopPropagation();
           const pdfId = this.closest('.pdf-preview').dataset.pdfId;
           toggleLike(pdfId, this);
       });
   });
+
+  document.querySelectorAll('.download-btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const pdfPreview = this.closest('.pdf-preview');
+          const pdfUrl = pdfPreview.dataset.pdfUrl; // Make sure to add this data attribute in your HTML
+          const title = pdfPreview.querySelector('.pdf-name').textContent;
+          downloadPDF(pdfUrl, title);
+      });
+  });
 }
 
-
+// Call this function when the page loads
+loadInspirationContent();
 
 // Call this function when inspiration button is clicked
 document.getElementById('inspirationButton').addEventListener('click', function(e) {
   e.preventDefault();
-  loadInspirationPDFs();
+  loadInspirationContent();
 });
-
-
 {% comment %} end pdf  {% endcomment %}
 
 
-      function displayColorPalette(layerIndex, colors, maxVisibleColors = 15) {
+{% comment %} for generating random color pallete  {% endcomment %}
+
+      function displayColorPalette(layerIndex, colors, maxVisibleColors = 6) {
         const paletteContainer = document.getElementById(`colorPalette_${layerIndex}`);
         paletteContainer.innerHTML = '';
     
@@ -1849,6 +1991,10 @@ document.getElementById('inspirationButton').addEventListener('click', function(
         // Initial render
         renderPalette();
     }
+
+
+
+    
       function loadZoomValue(){
         //document.getElementById('zoomWrapper').style.transform = `scale(${0.072})`;
         document.getElementById('zoomWrapper').style.transform = `scale(${0.3})`;
@@ -3607,7 +3753,7 @@ async function processHarmony(layerCtx, totalLayers, layerCanvas, currentLayerIn
 }
 
 // Color Conversion Utilities
-function rgbToHsl12(r, g, b) {
+function rgbToHsl(r, g, b) {
   r /= 255;
   g /= 255;
   b /= 255;
@@ -3633,7 +3779,7 @@ function rgbToHsl12(r, g, b) {
   return [h, s, l];
 }
 
-function hslToRgb12(h, s, l) {
+function hslToRgb(h, s, l) {
   let r, g, b;
 
   if (s === 0) {
@@ -3773,7 +3919,7 @@ function ensureDistinctColors(colors) {
 
 // Modify the generateHarmonyColors function to use ensureDistinctColors
 function generateHarmonyColors(baseColor, harmonyType) {
-  const hsl = rgbToHsl12(baseColor[0], baseColor[1], baseColor[2]);
+  const hsl = rgbToHsl(baseColor[0], baseColor[1], baseColor[2]);
   let colors = [];
 
   switch (harmonyType) {
@@ -3804,7 +3950,7 @@ function generateHarmonyColors(baseColor, harmonyType) {
   colors = ensureDistinctColors(colors);
   
   // Convert back to RGB
-  return colors.map(hsl => hslToRgb12(hsl[0], hsl[1], hsl[2]));
+  return colors.map(hsl => hslToRgb(hsl[0], hsl[1], hsl[2]));
 }
 document.addEventListener('DOMContentLoaded', function() {
   const harmonyButton = document.getElementById('harmonyButton');

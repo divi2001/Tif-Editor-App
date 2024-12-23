@@ -8,4 +8,5 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     # path('paypal/', views.paypal_view, name='paypal_view'),
     # path('paypal/', include(paypal_urls)),
+    path('admin/update_color/', views.update_color, name='update_color'),
 ]

@@ -76,6 +76,7 @@ class Palette(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     favorites_count = models.IntegerField(default=0)
+    num_colors = models.IntegerField(default=5, validators=[MinValueValidator(1), MaxValueValidator(10)])
 
     def __str__(self):
         return self.name
