@@ -1,0 +1,813 @@
+{% load static %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Colorify Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .dropdown {
+        position: relative;
+        display: inline-block;
+      }
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        right: 0;
+      }
+      .dropdown-content a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+      }
+      .dropdown-content a:hover {
+        background-color: #f1f1f1;
+      }
+      .show {
+        display: block;
+      }
+    </style>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <div class="p-3">
+      <!-- Top Navbar -->
+      <nav class="bg-white shadow-md rounded-xl">
+        <div class="mx-auto">
+          <div class="flex justify-between h-16">
+            <div class="flex">
+              <div class="flex-shrink-0 flex items-center ml-3">
+                <img
+                  class="h-8 w-auto"
+                  src="https://via.placeholder.com/32"
+                  alt="Colorify logo"
+                />
+                <span class="ml-2 text-xl font-bold text-indigo-600"
+                  >COLORIFY</span
+                >
+              </div>
+            </div>
+            <div class="flex items-center mr-8">
+              <button
+                class="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <span class="sr-only">View notifications</span>
+                <svg
+                  class="h-6 w-6"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                  />
+                </svg>
+              </button>
+              <div class="ml-3 relative">
+                <div>
+                  <button
+                    type="button"
+                    class="flex items-center max-w-xs bg-white rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    id="user-menu"
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                  >
+                    <img
+                      class="h-8 w-8 rounded-full"
+                      src="{% static "images\girlwithbook_c.jpg" %}"
+                      alt=""
+                    />
+                    <span class="ml-2 text-sm font-medium text-gray-700"
+                      >Abhishek Burnwal</span
+                    >
+                    <svg
+                      class="ml-1 h-5 w-5 text-gray-400"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div class="flex">
+        <!-- Sidebar -->
+        <div
+          class="w-16 bg-white shadow-md hidden flex-col items-center py-4 space-y-6 rounded-xl h-screen mt-8 md:flex"
+        >
+          <button class="p-2 rounded-lg hover:bg-gray-100">
+            <svg
+              class="h-6 w-6 text-gray-500"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
+            </svg>
+          </button>
+
+          <button class="p-2 rounded-lg hover:bg-gray-100">
+            <svg
+              class="h-6 w-6 text-gray-500"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+
+          <!-- Add more sidebar icons here -->
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-8">
+          <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            <!-- My Account -->
+            <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:col-span-2">
+              <h2 class="text-xl font-semibold mb-4">My Account</h2>
+              <div class="flex flex-col sm:flex-row mb-6">
+                <div class="w-full sm:w-1/3 mb-4 sm:mb-0 sm:mr-6">
+                  <div class="bg-teal-500 rounded-lg overflow-hidden mb-2">
+                    <img
+                      src="{% static "images\girlwithbook_c.jpg" %}"
+                      alt="Profile Picture"
+                      class="w-full h-auto"
+                    />
+                  </div>
+                  <button
+                    class="w-full bg-gray-200 text-gray-700 px-3 py-2 rounded-full text-sm"
+                  >
+                    Edit Profile Photo
+                  </button>
+                </div>
+                <div class="w-full sm:w-2/3 space-y-3">
+                  <div class="mb-2">
+                    <p class="text-sm text-gray-500 flex items-center">
+                      Name
+                      <svg
+                        class="h-3 w-3 ml-1 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                        ></path>
+                      </svg>
+                    </p>
+                    <p class="font-semibold">Abhishek Burnwal</p>
+                  </div>
+                  <div class="mb-2">
+                    <p class="text-sm text-gray-500 flex items-center">
+                      Gender
+                      <svg
+                        class="h-3 w-3 ml-1 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                        ></path>
+                      </svg>
+                    </p>
+                    <p>Male</p>
+                  </div>
+                  <div class="mb-2">
+                    <p class="text-sm text-gray-500 flex items-center">
+                      Designation
+                      <svg
+                        class="h-3 w-3 ml-1 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                        ></path>
+                      </svg>
+                    </p>
+                    <p>Designer</p>
+                  </div>
+                  <div class="mb-4">
+                    <p class="text-sm text-gray-500 flex items-center">
+                      Password
+                      <svg
+                        class="h-3 w-3 ml-1 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                        ></path>
+                      </svg>
+                    </p>
+                    <p>*****89v7</p>
+                  </div>
+                  <button
+                    class="text-red-500 text-sm border border-red-500 rounded-full px-4 py-1"
+                  >
+                    Delete Account Permanently
+                  </button>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <div>
+                  <h4 class="font-semibold mb-2 flex items-center">
+                    Address
+                    <svg
+                      class="h-4 w-4 ml-1 text-gray-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                      ></path>
+                    </svg>
+                  </h4>
+                  <p class="text-sm text-gray-500">Address Line</p>
+                  <p class="mb-2">35 Crescent Road</p>
+                  <p class="text-sm text-gray-500">City</p>
+                  <p class="mb-2">Ajah</p>
+                  <p class="text-sm text-gray-500">State</p>
+                  <p class="mb-2">Lagos</p>
+                  <p class="text-sm text-gray-500">Country</p>
+                  <p class="mb-4">India</p>
+                </div>
+                <div>
+                  <h4 class="font-semibold mb-2 flex items-center">
+                    Contact Details
+                    <svg
+                      class="h-4 w-4 ml-1 text-gray-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                      ></path>
+                    </svg>
+                  </h4>
+                  <p class="text-sm text-gray-500">Phone Number</p>
+                  <p class="mb-2">+91 12345 56789</p>
+                  <p class="text-sm text-gray-500">Email</p>
+                  <p>demo@mail.com</p>
+
+                  <div class="mt-5">
+                    <h4 class="font-semibold mb-2">Subscription</h4>
+                    <ul class="text-sm">
+                      <li class="flex items-center mb-1">
+                        <span
+                          class="w-2 h-2 bg-gray-400 rounded-full mr-2"
+                        ></span>
+                        Month 1
+                      </li>
+                      <li class="flex items-center mb-1">
+                        <span
+                          class="w-2 h-2 bg-gray-900 rounded-full mr-2"
+                        ></span>
+                        Month 2
+                        <span
+                          class="bg-gray-200 text-gray-800 px-2 py-0.5 rounded-full text-xs ml-2"
+                          >Current</span
+                        >
+                      </li>
+                      <li class="flex items-center">
+                        <span
+                          class="w-2 h-2 bg-gray-200 rounded-full mr-2"
+                        ></span>
+                        <span class="text-gray-400">Month 3</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <script>
+              // Toggle between view and edit mode
+              function toggleEdit(field) {
+                document.getElementById(`${field}View`).classList.add("hidden");
+                document
+                  .getElementById(`${field}Edit`)
+                  .classList.remove("hidden");
+              }
+
+              // Save the edited value
+              function saveEdit(field) {
+                const inputValue = document.getElementById(
+                  `${field}Input`
+                ).value;
+                document.getElementById(`${field}Text`).textContent =
+                  inputValue;
+
+                document
+                  .getElementById(`${field}View`)
+                  .classList.remove("hidden");
+                document.getElementById(`${field}Edit`).classList.add("hidden");
+              }
+
+              // Cancel editing and revert changes
+              function cancelEdit(field) {
+                document
+                  .getElementById(`${field}View`)
+                  .classList.remove("hidden");
+                document.getElementById(`${field}Edit`).classList.add("hidden");
+              }
+            </script>
+
+            <!-- Activity Overview -->
+            <div class="bg-white rounded-lg shadow-md p-6 lg:col-span-3">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Activity Overview</h2>
+                <button
+                  id="newProjectButton"
+                  class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm"
+                >
+                + New Project
+                </button>
+              </div>
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">My Projects</h3>
+                <div class="flex space-x-2">
+                  <div class="dropdown">
+                    <button
+                      onclick="toggleDropdown('sortDropdown')"
+                      class="bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-sm"
+                    >
+                      Sort By
+                    </button>
+                    <div id="sortDropdown" class="dropdown-content">
+                      <a href="#" onclick="sortTable('name')">Name</a>
+                      <div class="px-3 py-2">
+                        <p class="font-semibold">Date Range</p>
+                        <div class="flex space-x-2 mt-2">
+                          <input
+                            type="date"
+                            class="border rounded px-2 py-1 text-sm"
+                            placeholder="From:"
+                          />
+                          <input
+                            type="date"
+                            class="border rounded px-2 py-1 text-sm"
+                            placeholder="To:"
+                          />
+                        </div>
+                        <div class="mt-2">
+                          <label class="inline-flex items-center">
+                            <input
+                              type="radio"
+                              name="dateFilter"
+                              class="form-radio"
+                            />
+                            <span class="ml-2">Most Recent</span>
+                          </label>
+                        </div>
+                        <div class="mt-1">
+                          <label class="inline-flex items-center">
+                            <input
+                              type="radio"
+                              name="dateFilter"
+                              class="form-radio"
+                            />
+                            <span class="ml-2">Last Opened</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="dropdown">
+                    <button
+                      onclick="toggleDropdown('filterDropdown')"
+                      class="bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-sm"
+                    >
+                      Filter
+                    </button>
+                    <div id="filterDropdown" class="dropdown-content">
+                      <div class="px-3 py-2">
+                        <p class="font-semibold">Status</p>
+                        <div class="mt-2">
+                          <label class="inline-flex items-center">
+                            <input
+                              type="checkbox"
+                              class="form-checkbox text-indigo-600"
+                            />
+                            <span class="ml-2 text-yellow-600">Drafts</span>
+                          </label>
+                        </div>
+                        <div class="mt-1">
+                          <label class="inline-flex items-center">
+                            <input
+                              type="checkbox"
+                              class="form-checkbox text-indigo-600"
+                            />
+                            <span class="ml-2 text-green-600">Exported</span>
+                          </label>
+                        </div>
+                        <div class="mt-1">
+                          <label class="inline-flex items-center">
+                            <input
+                              type="checkbox"
+                              class="form-checkbox text-indigo-600"
+                            />
+                            <span class="ml-2 text-red-600">Deleted</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <table id="projectTable" class="w-full text-sm">
+                <thead>
+                  <tr class="text-left text-gray-500">
+                    <th class="pb-2">Name</th>
+                    <th class="pb-2">Date</th>
+                    <th class="pb-2">Status</th>
+                    <th class="pb-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-t">
+                    <td class="py-2">Lorem Ipsum dolor semet</td>
+                    <td class="py-2">04/12/2024</td>
+
+                    <td class="py-2">
+                      <span class="text-yellow-600">Drafts</span>
+                    </td>
+
+                    <td class="py-2">
+                      <div class="flex items-center space-x-2">
+                        <button class="text-indigo-600 hover:text-indigo-800">
+                          <svg
+                            class="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                            ></path>
+                          </svg>
+                        </button>
+                        <button class="text-green-600 hover:text-green-800">
+                          <svg
+                            class="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                            ></path>
+                          </svg>
+                        </button>
+                        <button class="text-red-600 hover:text-red-800">
+                          <svg
+                            class="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            ></path>
+                          </svg>
+                        </button>
+                        <button class="text-gray-500 hover:text-gray-700">
+                          <svg
+                            class="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                            ></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <!-- Repeat this row structure for the other 6 rows, changing the Status as needed -->
+                </tbody>
+              </table>
+            </div>
+
+            <script>
+              function toggleDropdown(dropdownId) {
+                document.getElementById(dropdownId).classList.toggle("show");
+              }
+
+              window.onclick = function (event) {
+                if (!event.target.matches(".dropdown button")) {
+                  var dropdowns =
+                    document.getElementsByClassName("dropdown-content");
+                  for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains("show")) {
+                      openDropdown.classList.remove("show");
+                    }
+                  }
+                }
+              };
+
+              function sortTable(column) {
+                var table, rows, switching, i, x, y, shouldSwitch;
+                table = document.getElementById("projectTable");
+                switching = true;
+                while (switching) {
+                  switching = false;
+                  rows = table.rows;
+                  for (i = 1; i < rows.length - 1; i++) {
+                    shouldSwitch = false;
+                    x =
+                      rows[i].getElementsByTagName("TD")[
+                        column === "name" ? 0 : column === "date" ? 1 : 2
+                      ];
+                    y =
+                      rows[i + 1].getElementsByTagName("TD")[
+                        column === "name" ? 0 : column === "date" ? 1 : 2
+                      ];
+                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                      shouldSwitch = true;
+                      break;
+                    }
+                  }
+                  if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                  }
+                }
+              }
+
+              function filterTable(status) {
+                var table, tr, td, i, txtValue;
+                table = document.getElementById("projectTable");
+                tr = table.getElementsByTagName("tr");
+                for (i = 0; i < tr.length; i++) {
+                  td = tr[i].getElementsByTagName("td")[2];
+                  if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (
+                      status === "all" ||
+                      txtValue.toLowerCase().indexOf(status.toLowerCase()) > -1
+                    ) {
+                      tr[i].style.display = "";
+                    } else {
+                      tr[i].style.display = "none";
+                    }
+                  }
+                }
+              }
+
+              document.addEventListener('DOMContentLoaded', function() {
+                const newProjectButton = document.getElementById('newProjectButton');
+                const projectTable = document.getElementById('projectTable').getElementsByTagName('tbody')[0];
+            
+                newProjectButton.addEventListener('click', function() {
+                  // Make an AJAX request to create a new project
+                  fetch('/core/create-new-project/', {
+                    method: 'POST',
+                    headers: {
+                      'X-CSRFToken': getCookie('csrftoken'),
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                  })
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data.status === 'success') {
+                      // Create a new row and insert it at the top of the table
+                      const newRow = projectTable.insertRow(0);
+                      newRow.innerHTML = `
+                        <td class="py-2">${data.project_name}</td>
+                        <td class="py-2">${new Date().toLocaleDateString()}</td>
+                        <td class="py-2"><span class="text-yellow-600">Drafts</span></td>
+                        <td class="py-2">
+                          <div class="flex items-center space-x-2">
+                            <button class="text-indigo-600 hover:text-indigo-800">
+                              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                              </svg>
+                            </button>
+                            <button class="text-green-600 hover:text-green-800">
+                              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                              </svg>
+                            </button>
+                            <button class="text-red-600 hover:text-red-800">
+                              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                              </svg>
+                            </button>
+                            <button class="text-gray-500 hover:text-gray-700">
+                              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      `;
+                    } else {
+                      console.error('Failed to create new project:', data.message);
+                    }
+                  })
+                  .catch(error => {
+                    console.error('Error:', error);
+                  });
+                });
+            
+                // Function to get CSRF token from cookies
+                function getCookie(name) {
+                  let cookieValue = null;
+                  if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                      const cookie = cookies[i].trim();
+                      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                      }
+                    }
+                  }
+                  return cookieValue;
+                }            
+              });
+            </script>
+
+            <!-- Favourite Inspirations -->
+            <div class="bg-white rounded-lg shadow-md p-6 lg:col-span-2">
+              <h2 class="text-xl font-semibold mb-4">Favourite Inspirations</h2>
+              <div class="grid grid-cols-3 gap-4">
+                <div class="h-24 rounded-lg overflow-hidden">
+                  <img
+                    src="{% static "images\image (1).png" %}"
+                    alt="Orange inspiration"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+                <div class="h-24 rounded-lg overflow-hidden">
+                  <img
+                    src="{% static "images\image (1).png" %}"
+                    alt="Pink inspiration"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+                <div class="h-24 rounded-lg overflow-hidden">
+                  <img
+                    src="{% static "images\image (1).png" %}"
+                    alt="Green inspiration"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+                <div class="h-24 rounded-lg overflow-hidden">
+                  <img
+                    src="{% static "images\image (1).png" %}"
+                    alt="Blue inspiration"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+                <div class="h-24 rounded-lg overflow-hidden">
+                  <img
+                    src="{% static "images\image (1).png" %}"
+                    alt="Purple inspiration"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+                <div class="h-24 rounded-lg overflow-hidden">
+                  <img
+                    src="{% static "images\image (1).png" %}"
+                    alt="Yellow inspiration"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Favorite Palette -->
+            <div class="bg-white rounded-lg shadow-md p-6 lg:col-span-3">
+              <h2 class="text-xl font-semibold mb-4">Favorite Palette</h2>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="">
+                  <img
+                    src="{% static "images\color_pallete.png" %}"
+                    alt="Color Palette"
+                    class="w-full h-full object-cover rounded-lg"
+                  />
+                </div>
+                <div class="">
+                  <img
+                    src="color_pallete.png"
+                    alt="Color Palette"
+                    class="w-full h-full object-cover rounded-lg"
+                  />
+                </div>
+                <div class="">
+                  <img
+                    src="color_pallete.png"
+                    alt="Color Palette"
+                    class="w-full h-full object-cover rounded-lg"
+                  />
+                </div>
+                <div class="">
+                  <img
+                    src="color_pallete.png"
+                    alt="Color Palette"
+                    class="w-full h-full object-cover rounded-lg"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -21,3 +21,6 @@ def terms_of_service_view(request):
 
 def affiliate_view(request):
     return render(request, 'pages/affiliate.html')
+
+def profile_dashboard_view(request):
+    return render(request, 'pages/profile-dashboard.html')
