@@ -101,8 +101,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'tif_editor_db',
         'USER': 'root',
-        'PASSWORD': 'tanuj1221',
-        'HOST': 'localhost',
+        'PASSWORD': 'root1221',
+        'HOST': '127.0.0.1',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",

@@ -203,6 +203,7 @@ def process_svg_upload(request):
         'height': height
     })
 
+
 def upload_tiff(request):
     if request.method == 'POST':
         form = TiffUploadForm(request.POST, request.FILES)
