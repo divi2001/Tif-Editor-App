@@ -9,6 +9,10 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.shortcuts import get_object_or_404
+from django.db import IntegrityError
+from django.utils.text import slugify
+
+
 
 User = get_user_model()
 
@@ -93,7 +97,7 @@ def project_list(request):
 @login_required
 @require_http_methods(["PUT"])
 def rename_project(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
+    project = get_object_or_404(Project, id=project_id, user=request.user)
     data = json.loads(request.body)
     new_name = data.get('name')
     
@@ -101,9 +105,32 @@ def rename_project(request, project_id):
         return JsonResponse({'error': 'New name is required'}, status=400)
     
     project.name = new_name
-    project.save()
     
-    return JsonResponse({'message': 'Project renamed successfully', 'project': {'id': project.id, 'name': project.name}})
+    # Generate a new slug based on the new name
+    new_slug = slugify(new_name)
+    
+    # Ensure the new slug is unique
+    original_slug = new_slug
+    counter = 1
+    while Project.objects.filter(slug=new_slug).exclude(id=project.id).exists():
+        new_slug = f"{original_slug}-{counter}"
+        counter += 1
+    
+    project.slug = new_slug
+    
+    try:
+        project.save()
+    except IntegrityError:
+        return JsonResponse({'error': 'Failed to rename project. Please try a different name.'}, status=400)
+    
+    return JsonResponse({
+        'message': 'Project renamed successfully', 
+        'project': {
+            'id': project.id, 
+            'name': project.name,
+            'slug': project.slug
+        }
+    })
 
 @csrf_exempt
 @login_required

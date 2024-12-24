@@ -10,7 +10,6 @@ urlpatterns = [
     path('export_tiff/', export_tiff, name='export_tiff'),
     path('upload-svg/', process_svg_upload, name='process_svg_upload'),
     path('analyze-color/', analyze_color, name='analyze-color'),
-  
     path('inspiration-pdfs/', views.inspiration_view, name='inspiration_pdfs'),
 ]
  
