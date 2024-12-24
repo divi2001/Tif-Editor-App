@@ -75,10 +75,19 @@ def create_new_project(request):
             'message': str(e)
         }, status=400)
 
+# apps/core/views.py
+from django.http import JsonResponse
+
 @login_required
 def project_list(request):
     projects = Project.objects.filter(user=request.user).exclude(status='deleted').order_by('-created_at')
-    return render(request, 'projects/project_list.html', {'projects': projects})
+    project_data = [{
+        'id': project.id,
+        'name': project.name,
+        'created_at': project.created_at.strftime('%Y-%m-%d'),
+        'status': project.status
+    } for project in projects]
+    return JsonResponse({'projects': project_data})
 
 @csrf_exempt
 @login_required
